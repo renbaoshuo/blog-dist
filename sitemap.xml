@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/auto-deploy-static-blog/</loc>
+    
+    <lastmod>2021-11-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/about/</loc>
+    
+    <lastmod>2021-11-07</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/ustc-hackergame-2021-write-up/</loc>
+    
+    <lastmod>2021-10-30</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/categories/</loc>
+    
+    <lastmod>2021-10-06</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/friends/</loc>
+    
+    <lastmod>2021-10-06</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/search/</loc>
+    
+    <lastmod>2021-10-06</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/</loc>
+    
+    <lastmod>2021-10-06</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/cors/</loc>
+    
+    <lastmod>2021-10-02</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/dn42-network/</loc>
+    
+    <lastmod>2021-08-18</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/noi-linux-2/</loc>
+    
+    <lastmod>2021-08-08</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/vps-cloudflare-warp/</loc>
+    
+    <lastmod>2021-07-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/bird-looking-glass/</loc>
+    
+    <lastmod>2021-05-03</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/my-own-asn/</loc>
+    
+    <lastmod>2021-03-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/workbox-service-worker/</loc>
+    
+    <lastmod>2021-02-27</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/darkmode/</loc>
+    
+    <lastmod>2021-02-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/linux-systemd/</loc>
+    
+    <lastmod>2021-02-11</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/hello-2021/</loc>
+    
+    <lastmod>2020-12-31</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/noip-2020/</loc>
+    
+    <lastmod>2020-12-05</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/download-smms-image/</loc>
+    
+    <lastmod>2020-11-28</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/luogu-spider/</loc>
+    
+    <lastmod>2020-11-26</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/change-git-submission-email/</loc>
+    
+    <lastmod>2020-11-25</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/ustc-hackergame-2020-write-up/</loc>
+    
+    <lastmod>2020-10-31</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/bilibili-1024-ctf-write-up/</loc>
+    
+    <lastmod>2020-10-26</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/raspberry-pi-rtmp-live/</loc>
+    
+    <lastmod>2020-10-05</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/tencent-cloud-cvm-dual-ip/</loc>
+    
+    <lastmod>2020-08-20</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/nginx-cloudflare-ip-only/</loc>
+    
+    <lastmod>2020-08-18</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/vmware-macos-bigsur/</loc>
+    
+    <lastmod>2020-08-03</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/clone-github-repo-faster/</loc>
+    
+    <lastmod>2020-07-21</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/handsome-leftbar-layout/</loc>
+    
+    <lastmod>2020-04-12</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/post/hello-world/</loc>
+    
+    <lastmod>2019-08-20</lastmod>
+    
+  </url>
+  
+
+  <url>
+    <loc>https://blog.baoshuo.ren/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/Hexo/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/GitHub-Actions/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/Vercel/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/Netlify/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/Cloudflare/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/CTF/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/Bilibili/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/BIRD/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/BGP/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/DN42/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/Git/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/Web/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/HTTP/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/JavaScript/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/%E5%89%8D%E7%AB%AF/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/Typecho/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/%E6%8A%98%E8%85%BE/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/Linux/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/%E7%AC%94%E8%AE%B0%E6%9C%AC/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/VMware/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/%E6%B8%B8%E8%AE%B0/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/%E8%85%BE%E8%AE%AF%E4%BA%91/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/Hackergame/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/macOS/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/ServiceWorker/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/categories/%E7%AC%94%E8%AE%B0%E6%9C%AC/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/categories/%E6%8A%80%E6%9C%AF%E5%90%91/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/categories/%E4%B9%90%E7%94%9F%E6%B4%BB/</loc>
+    <lastmod>2021-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+</urlset>
