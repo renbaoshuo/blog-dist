@@ -43,7 +43,7 @@
         <link rel="alternate" href="https://blog.baoshuo.ren/post/auto-deploy-static-blog/"/>
         <content type="html"><![CDATA[
             
-                <img src="https://vip1.loli.io/2021/10/31/uyZDJLU9NntF684.png">
+                <img src="https://s1.baoshuo.ren/2021/10/31/uyZDJLU9NntF684.png">
             
             <p>笔者最近阅读了 ChrAlpha 大佬的 <a href="https://blog.ichr.me/post/automated-deployment-of-serverless-static-blog/">初探无后端静态博客自动化部署方案</a> 这篇博文，发现其中的一些内容已经过时，所以我决定写下这篇博文来简单说一说现在（2021 年）静态博客的自动部署方案。</p>
 <span id="more"></span>
@@ -104,25 +104,25 @@
 <p>如果觉得 GitHub Actions + GitHub Pages 比较麻烦的话，才推出不久的 Cloudflare Pages 或许是一个不错的选择。</p>
 <p>前往 <a href="https://dash.cloudflare.com">CloudFlare 管理面板</a> 登录账号后即可在右侧找到「网页」或者「Pages」功能的入口。</p>
 <p>点击新建按钮，选择要使用的仓库，点击下一步。</p>
-<p><img src="https://vip1.loli.io/2021/10/31/9HpOja1N6JIK4DP.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/31/9HpOja1N6JIK4DP.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>Cloudflare Pages 的构建配置模板中并没有给出 Hexo 的模板，所以需要自己填写：</p>
-<p><img src="https://vip1.loli.io/2021/10/31/zc7GdhKqCSfliQ1.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/31/zc7GdhKqCSfliQ1.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>完成之后点击确定就可以开始构建站点了。</p>
-<p><img src="https://vip2.loli.io/2021/10/31/Z9YrJGNByXhKbkl.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/31/Z9YrJGNByXhKbkl.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>构建完成后，访问分配的 <code>pages.dev</code> 子域名即可查看构建好的站点。</p>
 <p>可以在「自定义域」选项卡中添加自定义域名。</p>
 <h2 id="netlify"><a class="anchor" href="#netlify"></a>Netlify</h2>
 <p>Netlify 是一家为静态网站提供托管服务的平台，有一定的免费额度，对于小型站点来说使用免费套餐就足够了。</p>
 <p>首先登陆账号，点击「New site from Git」按钮新建一个站点。</p>
-<p><img src="https://vip1.loli.io/2021/10/31/sULdZkfIgOBhzJP.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/31/sULdZkfIgOBhzJP.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>可以看到 Netlify 自动识别出了博客使用的框架并且填充好了构建命令，接下来只需要点击下一步即可。</p>
-<p><img src="https://vip1.loli.io/2021/10/31/yVlnMEJgeLSzwFD.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/31/yVlnMEJgeLSzwFD.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>新建站点完成以后可以在「Domain Settings」页面中修改默认分配的 <code>netlify.app</code> 子域名，并添加自定义域名。</p>
 <h2 id="vercel"><a class="anchor" href="#vercel"></a>Vercel</h2>
 <p>Vercel 是一个类似于 Netlify 的静态网站托管平台（Vercel 也支持托管 Serverless 函数，不过不在本文的讨论范围内）。</p>
-<p><img src="https://vip2.loli.io/2021/10/22/1oLr8fiODTNXSRP.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/22/1oLr8fiODTNXSRP.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>绑定好 GitHub 账号后导入一个新的项目即可。</p>
-<p><img src="https://vip1.loli.io/2021/10/31/EAsH2CWLUTZFeXu.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/31/EAsH2CWLUTZFeXu.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>Vercel 也和 Netlify 自动填充好了构建命令，如果没有特殊需求可以直接点击下一步。</p>
 <p>可以在项目的域名设置中绑定自定义域名。</p>
 <h2 id="参考资料"><a class="anchor" href="#参考资料"></a>参考资料</h2>
@@ -150,23 +150,23 @@
         <content type="html"><![CDATA[
             
             <h2 id="签到"><a class="anchor" href="#签到"></a>签到</h2>
-<p><img src="https://vip2.loli.io/2021/10/24/6HiDz8gjEVMQsph.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/24/6HiDz8gjEVMQsph.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>点击 <code>Next</code> 键，发现页面的 URL 后多了个 <code>?page=1</code> ，结合第一个页面中的 <code>1970-01-01</code> 字样，可以判断出来 <code>page</code> 参数应为比赛期间的 Unix 时间戳。</p>
 <p>示例：<a href="http://202.38.93.111:10000/?page=1635002186">http://202.38.93.111:10000/?page=1635002186</a></p>
 <h2 id="进制十六——参上"><a class="anchor" href="#进制十六——参上"></a>进制十六——参上</h2>
-<p><img src="https://vip1.loli.io/2021/10/24/swZPQblAxcqCtEz.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/24/swZPQblAxcqCtEz.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>可以照着 16 进制数据搞一搞，然后 flag 就出来了：</p>
-<p><img src="https://vip1.loli.io/2021/10/24/poz4TdtU8nVPg75.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/24/poz4TdtU8nVPg75.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="去吧！追寻自由的电波"><a class="anchor" href="#去吧！追寻自由的电波"></a>去吧！追寻自由的电波</h2>
 <p>下载音频之后使用 Adobe Audition 进行变速即可。</p>
-<p><img src="https://vip2.loli.io/2021/10/24/GyoM3w185UhPxbz.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/24/GyoM3w185UhPxbz.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="旅行照片"><a class="anchor" href="#旅行照片"></a>旅行照片</h2>
-<p><img src="https://vip1.loli.io/2021/10/25/lHJ6SwxrW8mQf53.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/25/lHJ6SwxrW8mQf53.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>从图片中可以看出拍摄者在 14 层，并且楼下有一个蓝色的肯德基，那么使用 Google 搜索关键词 <code>海洋 蓝色 KFC</code> 可以得到以下结果：</p>
-<p><img src="https://vip1.loli.io/2021/10/25/FzxEHLfX5ylKkiN.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/25/FzxEHLfX5ylKkiN.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>从照片的描述中可以得到这家肯德基位于秦皇岛新澳海底世界。</p>
 <p>在百度地图上可以找到这家肯德基的电话、详细位置。同时按照卫星图可以推断出拍摄者所在的方向，进而推断出拍摄的大致时间。</p>
-<p><img src="https://vip2.loli.io/2021/10/25/crgFKpCOaoq8WzN.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/25/crgFKpCOaoq8WzN.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>flag 获取成功。</p>
 <h2 id="flag-助力大红包"><a class="anchor" href="#flag-助力大红包"></a>FLAG 助力大红包</h2>
 <p>查看点击助力按钮后的浏览器请求可以发现请求时有一个名为 IP 的参数，尝试修改这个参数发现会报错提示前后端检测 IP 不一致，那么考虑添加 <code>X-Forwarded-For</code> 头伪造经过代理的来源 IP 地址即可。</p>
@@ -183,7 +183,7 @@
 <ol start="2">
 <li>中国科学技术大学 Linux 用户协会在近五年多少次被评为校五星级社团？</li>
 </ol>
-<p><img src="https://vip2.loli.io/2021/10/24/32Oq1tW86oke7rI.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/24/32Oq1tW86oke7rI.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>LUG 官网上直接搜就出来了。但实际上的答案应该是 5 ，可能是官网没更新最新信息。</p>
 <ol start="3">
 <li>中国科学技术大学 Linux 用户协会位于西区图书馆的活动室门口的牌子上“LUG @ USTC”下方的小字是？</li>
@@ -192,7 +192,7 @@
 <p>谷歌是你的好朋友。
 <cite>Hackergame 2020 「猫咪问答++」 flag 。</cite></p>
 </blockquote>
-<p><img src="https://vip1.loli.io/2021/10/24/MCq9mGNQFUDoHy1.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/24/MCq9mGNQFUDoHy1.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>可以看到正确答案为 <code>Development Team of Library</code> 。</p>
 <ol start="4">
 <li>在 SIGBOVIK 2021 的一篇关于二进制 Newcomb-Benford 定律的论文中，作者一共展示了多少个数据集对其理论结果进行验证？</li>
@@ -207,9 +207,9 @@
 <h2 id="卖瓜"><a class="anchor" href="#卖瓜"></a>卖瓜</h2>
 <p>最开始拿到题我先想的是能不能用负数凑，结果发现不行，于是考虑溢出。</p>
 <p>试了试发现使用 6 斤瓜无法触发溢出，而使用 9 斤瓜的就可以触发溢出了。</p>
-<p><img src="https://vip2.loli.io/2021/10/27/HGwsJeqB63SZrNA.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/27/HGwsJeqB63SZrNA.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>写了个脚本跑一跑，试出来了几个负数，挨个试了下发现放 2e18 个 9 斤瓜可以凑到 20 斤。</p>
-<p><img src="https://vip2.loli.io/2021/10/27/APRwaqf6SO3DTyH.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/27/APRwaqf6SO3DTyH.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>然后在计算器里算了一下，只需要加 6 斤的瓜和 9 斤的瓜各 29782938247303441 个就能让称的显示变成 -1 。</p>
 <p>接下来放 2 个 6 斤瓜和 1 个 9 斤瓜就能拿到 flag 了。</p>
 <h2 id="透明的文件"><a class="anchor" href="#透明的文件"></a>透明的文件</h2>
@@ -223,7 +223,7 @@
         <span class="built_in">echo</span> -n <span class="string">&quot;▉&quot;</span>
     <span class="keyword">done</span>
 &#125;</code></pre>
-<p><img src="https://vip1.loli.io/2021/10/29/mniZ4Qch5rHCxWI.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/29/mniZ4Qch5rHCxWI.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>再配合上方替换好的文件输出即可，效果如图。</p>
 <h2 id="amnesia"><a class="anchor" href="#amnesia"></a>Amnesia</h2>
 <h3 id="轻度失忆"><a class="anchor" href="#轻度失忆"></a>轻度失忆</h3>
@@ -256,7 +256,7 @@
     &#125;
   &#125;
 &#125;</code></pre>
-<p><img src="https://vip1.loli.io/2021/10/25/OpGkfi3FyAbugwT.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/25/OpGkfi3FyAbugwT.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>发现一个名为 <code>GUser</code> 的类型，再构造一个语句查询类型结构：</p>
 <pre><code class="highlight graphql">&#123;
   __type(name: &quot;GUser&quot;) &#123;
@@ -274,11 +274,11 @@
     &#125;
   &#125;
 &#125;</code></pre>
-<p><img src="https://vip1.loli.io/2021/10/25/XzhIAwocnVMx6Lk.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/25/XzhIAwocnVMx6Lk.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>顺便获取了下 <code>GNote</code> 类型的结构：</p>
-<p><img src="https://vip2.loli.io/2021/10/25/9mtWaPAFoYfDLXu.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/25/9mtWaPAFoYfDLXu.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>进行查询即可得到 flag ：</p>
-<p><img src="https://vip1.loli.io/2021/10/25/wKs5BpteaYbAcoP.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/25/wKs5BpteaYbAcoP.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="后记"><a class="anchor" href="#后记"></a>后记</h2>
 <p>今年拿的名次比去年的高，感觉在这一年里自己的 web 水平有很大的提升，但 math 还是一如既往地爆了零，和我的数学中考成绩一样的烂。</p>
 <p>以后如果有时间的话逆向、汇编什么的也都要学一学，不然的话每次一看见 binary 就有点不知所措、无从下手属实不太好。</p>
@@ -297,7 +297,7 @@
         <link rel="alternate" href="https://blog.baoshuo.ren/post/cors/"/>
         <content type="html"><![CDATA[
             
-                <img src="https://vip1.loli.io/2021/10/02/6YfLj17HUV4e9Wd.png">
+                <img src="https://s1.baoshuo.ren/2021/10/02/6YfLj17HUV4e9Wd.png">
             
             <p>跨域资源共享（CORS）是一种基于 HTTP 头来让网页的受限资源能够被其他域名的页面访问的一种机制。通过该机制，页面能够自由地使用不同源（cross-origin）的图片、样式、脚本、iframes 以及视频。</p>
 <p>在通常情况下，一些跨域的请求（特别是 ajax）会被同源策略（same-origin policy）禁止。而 CORS 定义了一种方式，可以允许 Web 应用服务器进行跨源访问控制，从而使得跨源数据传输得以安全进行。</p>
@@ -347,7 +347,7 @@
 <p>上面提到，CORS 请求除了简单请求外还有非简单请求。简单来说，非简单请求时对服务器有特殊要求的请求，比如请求方法是 <code>PUT</code> 或 <code>DELETE</code> ，或者 HTTP 头中 <code>Content-Type</code> 字段的值不是上文所述的那三个「对 CORS 安全的 <code>Content-type</code> 字段值」。</p>
 <h3 id="基本流程-t2"><a class="anchor" href="#基本流程-t2"></a>基本流程</h3>
 <p>非简单请求的 CORS 请求，会在正式通信之前增加一次称为「预检」（preflight）的 HTTP 查询请求。</p>
-<p><img src="https://vip2.loli.io/2021/10/02/Nt9o2cX7gWzuMCr.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/02/Nt9o2cX7gWzuMCr.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>从上面的报文中可以看到，浏览器先发送了一个使用 <code>OPTIONS</code> 方法的「预检请求」。OPTIONS 是 HTTP/1.1 协议中定义的方法，用以从服务器获取更多信息。该方法不会对服务器资源产生影响。预检请求中同时携带了下面两个首部字段：</p>
 <pre><code class="highlight http"><span class="attribute">Access-Control-Request-Method</span><span class="punctuation">: </span>POST
 <span class="attribute">Access-Control-Request-Headers</span><span class="punctuation">: </span>X-PINGOTHER, Content-Type</code></pre>
@@ -414,16 +414,16 @@ xhr.send();</code></pre>
         <link rel="alternate" href="https://blog.baoshuo.ren/post/noi-linux-2/"/>
         <content type="html"><![CDATA[
             
-                <img src="https://vip2.loli.io/2021/08/15/POMht9fim1vVKcp.png">
+                <img src="https://s1.baoshuo.ren/2021/08/15/POMht9fim1vVKcp.png">
             
             <p>时隔多年，CCF 终于发布了新版的 NOI Linux ，替换了以前基于 Ubuntu 14.04 的 NOI Linux 1.4.1。</p>
 <span id="more"></span>
 <p>在 NOI Linux 2.0 发布的当天，我就迫不及待地下载好了镜像（<a href="https://noiresources.ccf.org.cn/ubuntu-noi-v2.0.iso"><code>ubuntu-noi-v2.0.iso</code></a>），但由于时间原因，没有第一时间进行体验。</p>
 <h2 id="安装"><a class="anchor" href="#安装"></a>安装</h2>
 <p>首先先新建好一台虚拟机。</p>
-<p><img src="https://vip2.loli.io/2021/07/25/ceaObqknR3FTtlU.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/07/25/ceaObqknR3FTtlU.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>新建虚拟机及挂载镜像的步骤不再过多叙述，在安装时需要断开网络连接。</p>
-<p><img src="https://vip2.loli.io/2021/07/25/PeYV6lquxawzL7b.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/07/25/PeYV6lquxawzL7b.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>开屏就是自定义的启动界面。</p>
 <p>安装后需要连接网络，运行 <code>sudo apt update</code> 更新软件包列表，然后安装 <code>open-vm-tools-desktop</code> ，安装完成后建议重启虚拟机。</p>
 <h2 id="简单体验"><a class="anchor" href="#简单体验"></a>简单体验</h2>
@@ -436,30 +436,30 @@ xhr.send();</code></pre>
 <li>在考场上推荐使用 Sublime Text 或者 Code::Blocks 进行代码编写，不推荐使用 VSCode 。</li>
 </ol>
 <h3 id="更新"><a class="anchor" href="#更新"></a>更新</h3>
-<p><img src="https://vip2.loli.io/2021/08/08/MbBrDuQyYpwP9TA.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/08/08/MbBrDuQyYpwP9TA.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>模拟考试环境时不建议安装<strong>任何</strong>更新，以还原考场上的「本真的」NOI Linux 。如果需要日常使用则建议安装更新。</p>
 <h3 id="vscode"><a class="anchor" href="#vscode"></a>VSCode</h3>
-<p><img src="https://vip2.loli.io/2021/08/08/vs2mDg5KCO61n8X.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/08/08/vs2mDg5KCO61n8X.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>CCF 预置在 NOI Linux 2.0 中的 VSCode 只能当一个编辑器，并且并没有安装中文语言包和完整的 C/C++ 扩展，处于半残状态。</p>
 <h3 id="sublime-text"><a class="anchor" href="#sublime-text"></a>Sublime Text</h3>
-<p><img src="https://vip1.loli.io/2021/08/08/TuEGMtsYcndIoNm.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/08/08/TuEGMtsYcndIoNm.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>相比于 VSCode ，NOI Linux 预装的 Sublime Text 的自动补全功能在始终离线的环境下依旧能正常工作，同时 Sublime Text 也支持单文件编译运行，颜值也不低，写起代码来很舒服。</p>
 <h3 id="code-blocks"><a class="anchor" href="#code-blocks"></a>Code::Blocks</h3>
-<p><img src="https://vip1.loli.io/2021/08/08/J598DiCRqthEgTS.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/08/08/J598DiCRqthEgTS.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>Code::Blocks 是一个免费、开源、跨平台的集成开发环境，可以在 <a href="https://www.codeblocks.org/">codeblocks.org</a> 上找到系统对应版本的 Code::Blocks 预编译二进制包及其源码。</p>
 <p>NOI Linux 中内置的 Code::Blocks 的自动补全、代码提示等功能均能正常使用，且不需要网络连接。</p>
 <h3 id="nano"><a class="anchor" href="#nano"></a>Nano</h3>
-<p><img src="https://vip2.loli.io/2021/08/08/9BrALjlHxGK54kR.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/08/08/9BrALjlHxGK54kR.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>关于 Nano 此处就不再过多叙述，可以在 <a href="https://nano-editor.org">The GNU nano homepage</a> 上找到系统对应版本的 Nano 预编译二进制包及其源码。</p>
 <h3 id="emacs"><a class="anchor" href="#emacs"></a>Emacs</h3>
-<p><img src="https://vip2.loli.io/2021/08/08/FQdGqx8bv2oZNJL.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/08/08/FQdGqx8bv2oZNJL.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>笔者并没有深度体验过 Emacs ，所以不做过多评价，在这里推荐一篇入门教程：<a href="https://liujiacai.net/blog/2020/11/25/why-emacs/">Emacs 入门指南：Why &amp; How - Keep Coding</a> 。</p>
 <p>可以在 <a href="https://www.gnu.org/software/emacs/">GNU Emacs</a> 找到系统对应版本的 Emacs 预编译二进制包及其源码。</p>
 <h3 id="vim"><a class="anchor" href="#vim"></a>Vim</h3>
-<p><img src="https://vip1.loli.io/2021/08/08/aN9xjIneAYByEXv.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/08/08/aN9xjIneAYByEXv.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>Vim 还是老样子，可以在 <a href="https://www.vim.org">vim.org</a> 上找到系统对应版本的 Vim 预编译二进制包及其源码，关于 Vim 的使用请参阅 <a href="http://linux.vbird.org/linux_basic/0310vi.php">第九章、vim 程式編輯器 - 鳥哥的 Linux 私房菜</a>。</p>
 <h3 id="编译器"><a class="anchor" href="#编译器"></a>编译器</h3>
-<p><img src="https://vip1.loli.io/2021/08/07/lWviXCj9Txqgmr8.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/08/07/lWviXCj9Txqgmr8.png" alt="" loading="lazy" data-action="zoom"></p>
 <blockquote>
 <p>使用 <code>g++ -dM -E -x c++ /dev/null | grep -F __cplusplus</code> 命令可以查看编译器默认使用的 C++ 标准。</p>
 </blockquote>
@@ -487,27 +487,27 @@ xhr.send();</code></pre>
         <link rel="alternate" href="https://blog.baoshuo.ren/post/vps-cloudflare-warp/"/>
         <content type="html"><![CDATA[
             
-                <img src="https://vip1.loli.io/2021/08/15/UOBRkoXaV9wnYW6.jpg">
+                <img src="https://s1.baoshuo.ren/2021/08/15/UOBRkoXaV9wnYW6.jpg">
             
             <p><a href="https://blog.cloudflare.com/1111-warp-better-vpn/">Warp</a> 是 Cloudflare 提供的一项基于 WireGuard 的网络流量安全及加速服务，能够让你通过连接到 Cloudflare 的边缘节点实现隐私保护及链路优化。</p>
 <span id="more"></span>
 <p>由于 Cloudflare 官方的 <a href="https://developers.cloudflare.com/warp-client/setting-up/linux">Warp Client</a> 过于臃肿，导致我看到安装包大小后就决定直接放弃安装，于是我选择了 <a href="https://github.com/ViRb3/wgcf">ViRb3/wgcf</a> 替代。</p>
-<p><img src="https://vip1.loli.io/2021/07/15/dHClLqSsvDKbrBc.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/07/15/dHClLqSsvDKbrBc.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="安装依赖"><a class="anchor" href="#安装依赖"></a>安装依赖</h2>
 <p>可以前往 <a href="https://github.com/ViRb3/wgcf/releases/latest">Releases 页面</a> 下载编译好的二进制文件以供使用。</p>
 <p>也可使用如下命令安装：</p>
 <pre><code class="highlight bash">curl -Ls https://git.io/wgcf-installer.sh | bash</code></pre>
 <p>安装好之后运行 <code>wgcf --help</code> ，得到类似下图的输出即为安装成功：</p>
-<p><img src="https://vip1.loli.io/2021/07/15/lDaywAzQGd8HI9S.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/07/15/lDaywAzQGd8HI9S.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>另外还需按照 <a href="https://www.wireguard.com/install/">WireGuard 官网</a> 上的说明安装 WireGuard 。</p>
 <p>根据需求可能还需要安装 <code>resolvconf</code> 。</p>
 <h2 id="生成-wireguard-配置文件"><a class="anchor" href="#生成-wireguard-配置文件"></a>生成 WireGuard 配置文件</h2>
 <p>先使用 <code>wgcf register</code> 命令注册 Warp ，使用键盘上的方向键选择 「Yes」 并回车确认：</p>
-<p><img src="https://vip2.loli.io/2021/07/15/MYT5bkX4r2pGHUv.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/07/15/MYT5bkX4r2pGHUv.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>注册成功后的提示：</p>
-<p><img src="https://vip2.loli.io/2021/07/15/y4homkVbqsr9PYj.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/07/15/y4homkVbqsr9PYj.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>之后使用 <code>wgcf generate</code> 命令生成配置文件。</p>
-<p><img src="https://vip1.loli.io/2021/07/15/3zWUZYTdGhn9qkP.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/07/15/3zWUZYTdGhn9qkP.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="修改-wireguard-配置文件"><a class="anchor" href="#修改-wireguard-配置文件"></a>修改 WireGuard 配置文件</h2>
 <p>这是一份生成出来的配置文件：</p>
 <pre><code class="highlight ini"><span class="section">[Interface]</span>
@@ -543,7 +543,7 @@ xhr.send();</code></pre>
 <p>将刚才修改好的配置文件移动到 <code>/etc/wireguard/</code> 目录下，推荐命名为 <code>wgcf.conf</code> ，下面的操作以这个文件名为准。</p>
 <p>使用 <code>systemd enable --now wg-quick@wgcf</code> 命令启动隧道，然后使用 <code>wg show wgcf</code> 命令查看隧道状态。</p>
 <p>如果在启动时出现了错误，可以使用 <code>systemd status wg-quick@wgcf</code> 命令查看错误信息，修复后使用 <code>systemd start wg-quick@wgcf</code> 启动隧道。</p>
-<p><img src="https://vip1.loli.io/2021/07/15/M9D1L2rFfHCPtcU.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/07/15/M9D1L2rFfHCPtcU.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>之后就可以享受双栈网络带来的便利了~</p>
 <p>注：日常如果需要重启隧道可以使用 <code>systemctl restart wg-quick@wgcf</code> 命令。</p>
 <h2 id="后记"><a class="anchor" href="#后记"></a>后记</h2>
@@ -656,7 +656,7 @@ pip install docker-compose</code></pre>
 <pre><code class="highlight stylus">eu1<span class="selector-class">.dn42</span><span class="selector-class">.as141776</span><span class="selector-class">.net</span>.  <span class="number">3600</span>    IN      A       <span class="number">136.243</span>.<span class="number">221.96</span>
 cn1<span class="selector-class">.dn42</span><span class="selector-class">.as141776</span><span class="selector-class">.net</span>.  <span class="number">3600</span>    IN      CNAME   home<span class="selector-class">.baoshuo</span><span class="selector-class">.ren</span>.</code></pre>
 <h2 id="成果"><a class="anchor" href="#成果"></a>成果</h2>
-<p><img src="https://vip2.loli.io/2021/05/03/iaFfTWAhpdZGJ9t.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/05/03/iaFfTWAhpdZGJ9t.png" alt="" loading="lazy" data-action="zoom"></p>
 
         ]]></content>
         <summary type="html"><![CDATA[<p>BIRD 是 Linux 上常用的一款 BGP 路由软件。bird-lg-go 是 <a href="https://lantian.pub">蓝天</a> 使用 Go 语言编写的 Looking Glass 程序，内存占用比原版 bird-lg 更低。它提供了一个网页面板，可以显示各个服务器上的 BIRD 路由软件的状态，以及查询到指定 IP 的路由。</p>]]></summary>
@@ -672,7 +672,7 @@ cn1<span class="selector-class">.dn42</span><span class="selector-class">.as1417
         <link rel="alternate" href="https://blog.baoshuo.ren/post/dn42-network/"/>
         <content type="html"><![CDATA[
             
-                <img src="https://vip1.loli.io/2021/04/03/R6IHLundNjpKxCD.png">
+                <img src="https://s1.baoshuo.ren/2021/04/03/R6IHLundNjpKxCD.png">
             
             <p>DN42 全称 Decentralized Network 42（42 号去中心网络），是一个大型、去中心化的 BGP 网络。DN42 的目的是模拟一个互联网。它使用了大量在目前互联网骨干上应用的技术（例如 BGP 和递归 DNS），可以很好地模拟一个真实的网络环境。</p>
 <span id="more"></span>
@@ -836,14 +836,14 @@ source:             DN42</code></pre>
 <p>如需添加 IPv6 路由，将本节所述的 <code>route</code> 改为 <code>route6</code> 即可，此处不再赘述。</p>
 <h3 id="上传更改到-dn42-注册表"><a class="anchor" href="#上传更改到-dn42-注册表"></a>上传更改到 DN42 注册表</h3>
 <p>完成以上步骤之后，使用 <code>git diff</code> 查看文件变动，检查无误后，使用 <code>git add .</code> 暂存。</p>
-<p><img src="https://vip2.loli.io/2021/08/14/RhjwYHFGcaKUSye.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/08/14/RhjwYHFGcaKUSye.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>运行仓库根目录下的 <code>./check-my-stuff &lt;维护者&gt;</code> 检查文件内容是否有误，确定无误后，提交。</p>
 <p>在提交时，如果需要使用 GPG 签名，需要在添加 <code>-S</code> 参数，如 <code>git commit -S</code> ；如果使用 SSH 签名，请直接使用 <code>git commit</code> 进行提交，待提交后再进行签名工作。</p>
 <p>使用下面的命令进行签名：</p>
 <pre><code class="highlight bash">./sign-my-commit --ssh --key &lt;SSH 私钥文件&gt; &lt;维护者&gt;</code></pre>
 <p>之后使用下面的命令上传即可：</p>
 <pre><code class="highlight bash">git push --set-upstream origin &lt;用户名&gt;-&lt;日期, YYYYMMDD&gt;/register</code></pre>
-<p><img src="https://vip2.loli.io/2021/04/04/1YwNjs8uvOJMFoq.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/04/04/1YwNjs8uvOJMFoq.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>上传后在 DN42 Git 中切换到自己的分支，并创建一个合并请求，等待管理员审核。</p>
 <h3 id="注意事项"><a class="anchor" href="#注意事项"></a>注意事项</h3>
 <ol>
@@ -1015,7 +1015,7 @@ wget -4 -O /tmp/dn42_roa_v6.conf https://dn42.burble.com/roa/dn42_roa_bird2_6.co
 <h3 id="重新加载-bird-配置"><a class="anchor" href="#重新加载-bird-配置"></a>重新加载 BIRD 配置</h3>
 <pre><code class="highlight bash">birdc configure</code></pre>
 <p>使用该命令重新加载 BIRD 配置，并使用 <code>birdc show protocol</code> 查看状态。</p>
-<p><img src="https://vip1.loli.io/2021/08/16/ZSPe6a3fpuDATG2.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/08/16/ZSPe6a3fpuDATG2.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="dn42-wireguard-使用入门"><a class="anchor" href="#dn42-wireguard-使用入门"></a>DN42 WireGuard 使用入门</h2>
 <p>WireGuard 是一种简单易用、速度快、现代化的 VPN ，它利用了最先进的加密技术，并使用 UDP 协议传输数据。WireGuard 设计为通用 VPN ，可在嵌入式设备和超级计算机上运行，​​ 适用于许多不同的环境。WireGuard 起初是专为 Linux 编写并发布的，后来被移植到各个平台上。在 <a href="http://WireGuard.com">WireGuard.com</a> 上可以找到它的 <a href="https://www.wireguard.com/papers/wireguard.pdf">技术白皮书</a> 。</p>
 <h3 id="安装-wireguard"><a class="anchor" href="#安装-wireguard"></a>安装 WireGuard</h3>
@@ -1065,7 +1065,7 @@ apt install wireguard -y</code></pre>
 <h3 id="检测隧道状态"><a class="anchor" href="#检测隧道状态"></a>检测隧道状态</h3>
 <pre><code class="highlight bash">wg show &lt;隧道名&gt;</code></pre>
 <p>使用该命令即可查看隧道状态。</p>
-<p><img src="https://vip1.loli.io/2021/08/16/wxgUJNHnQAXFMdS.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/08/16/wxgUJNHnQAXFMdS.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>如上图所示，当 <code>latest handshake</code> 时间较近且 <code>transfer</code> 有收有发时可以认为隧道正常。</p>
 <p>如需查看所有隧道的状态，直接使用 <code>wg</code> 命令即可。</p>
 <h2 id="与其他网络进行对等互联"><a class="anchor" href="#与其他网络进行对等互联"></a>与其他网络进行对等互联</h2>
@@ -1122,7 +1122,7 @@ sysctl -p</code></pre>
         <link rel="alternate" href="https://blog.baoshuo.ren/post/my-own-asn/"/>
         <content type="html"><![CDATA[
             
-                <img src="https://vip2.loli.io/2021/02/28/XMjiBGVdHmARW48.png">
+                <img src="https://s1.baoshuo.ren/2021/02/28/XMjiBGVdHmARW48.png">
             
             <p>很久之前就有了这样的一个想法：拥有一个自己的 ASN 。2021 年的寒假末尾，我终于找到了一个肯给我这个未成年人申请 ASN 的 LIR 。</p>
 <span id="more"></span>
@@ -1152,9 +1152,9 @@ sysctl -p</code></pre>
 <h2 id="申请-vultr-的-bgp-广播功能"><a class="anchor" href="#申请-vultr-的-bgp-广播功能"></a>申请 Vultr 的 BGP 广播功能</h2>
 <p>Vultr 的 BGP 广播功能可以称得上是「新手友好」的了。Vultr 良好的过滤系统保证了一般情况下即使发送了错误的路由表也不会漏到公网去，不怕搞炸，方便学习时使用。</p>
 <p>点击 <a href="https://my.vultr.com/bgp/">https://my.vultr.com/bgp/</a> 进入 Vultr BGP 广播功能的开通页面。</p>
-<p><img src="https://vip2.loli.io/2021/03/12/aYNdpciAb217wuP.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/03/12/aYNdpciAb217wuP.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>点击页面中的 <strong>Get Started</strong> 进入 BGP 开通申请页面。</p>
-<p><img src="https://vip1.loli.io/2021/03/12/Sb6AoPXTuJ3YIKn.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/03/12/Sb6AoPXTuJ3YIKn.png" alt="" loading="lazy" data-action="zoom"></p>
 <ol>
 <li>将 <strong>I have my own IP space</strong> 和 <strong>I have my own ASN</strong> 设置为 YES 。</li>
 <li>在 <strong>My ASN</strong> 处填写 ASN （不含 <code>AS</code> 前缀）。</li>
@@ -1190,18 +1190,18 @@ From,
 [职位, 如 Network Administrator]
 [电话号码]</code></pre>
 </details>
-<p><img src="https://vip2.loli.io/2021/03/13/nbQxcZLFNV6KBgP.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/03/13/nbQxcZLFNV6KBgP.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>提交完毕之后会出现如图所示的界面，点击 <strong>Start</strong> 即可开始验证进程。</p>
-<p><img src="https://vip1.loli.io/2021/03/13/6QKhFL4PGxoeEXn.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/03/13/6QKhFL4PGxoeEXn.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>以 AS141776 的验证为例，选择好接收验证邮件的邮箱，然后点击 <strong>Send</strong> 即可。</p>
-<p><img src="https://vip2.loli.io/2021/03/13/rE4txqgBLeZK9Ou.png" alt="" loading="lazy" data-action="zoom"></p>
-<p><img src="https://vip2.loli.io/2021/03/13/rAOSIP5oezGRqpc.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/03/13/rE4txqgBLeZK9Ou.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/03/13/rAOSIP5oezGRqpc.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>点击邮箱里的链接即可（第一个是允许，第二个是拒绝）</p>
-<p><img src="https://vip2.loli.io/2021/03/13/xBXiqmukOQbZT6r.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/03/13/xBXiqmukOQbZT6r.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>验证成功后的提示。</p>
 <p>之后等待客服开通即可。</p>
 <p>由于我是在晚上申请的 Vultr BGP 服务，所以几分钟就开通好了。</p>
-<p><img src="https://vip2.loli.io/2021/03/13/2aLwgPWHzlxF9DY.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/03/13/2aLwgPWHzlxF9DY.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>之后不要忘记去控制台重启实例哦~</p>
 <h2 id="使用-bird2-广播-ip"><a class="anchor" href="#使用-bird2-广播-ip"></a>使用 BIRD2 广播 IP</h2>
 <p>可以参考我在 <a href="/post/dn42-network/#dn42-bird2-%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8">初探 DN42 网络</a> 这篇文章的「DN42 BIRD2 使用入门」一节中描述的步骤，此处不再赘述。</p>
@@ -1243,7 +1243,7 @@ From,
         <link rel="alternate" href="https://blog.baoshuo.ren/post/workbox-service-worker/"/>
         <content type="html"><![CDATA[
             
-                <img src="https://vip1.loli.io/2021/02/28/kdnvD8ACWBa1tbI.png">
+                <img src="https://s1.baoshuo.ren/2021/02/28/kdnvD8ACWBa1tbI.png">
             
             <p>对于优化前端加载性能这个问题，许多人以 http-cache、异步加载、304 状态码、文件压缩、CDN 等方法来解决。<br>
 其实除了这些方法，还有一个比它们都强大的，那就是 Service Worker 。</p>
@@ -1266,7 +1266,7 @@ From,
 <p>你可以在这个文件中写入以下代码来检测是否成功地注册了 Service Worker 。</p>
 <pre><code class="highlight javascript"><span class="built_in">console</span>.clear();
 <span class="built_in">console</span>.log(<span class="string">&#x27;Successful registered service worker.&#x27;</span>);</code></pre>
-<p><img src="https://vip2.loli.io/2021/02/28/Eu4mVIC2kNrUgiL.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/28/Eu4mVIC2kNrUgiL.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="引入-workbox"><a class="anchor" href="#引入-workbox"></a>引入 Workbox</h2>
 <p>你可以使用 Google 提供的 CDN 来引入 Workbox 。<br>
 只需在 <code>sw.js</code> 的开头写入以下内容即可：</p>
@@ -1283,7 +1283,7 @@ workbox.setConfig(&#123;
 &#125;);</code></pre>
 <h2 id="workbox-策略"><a class="anchor" href="#workbox-策略"></a>Workbox 策略</h2>
 <h3 id="stale-while-revalidate（重新验证时过期）"><a class="anchor" href="#stale-while-revalidate（重新验证时过期）"></a>Stale While Revalidate（重新验证时过期）</h3>
-<p><img src="https://vip1.loli.io/2021/02/28/rx8zafbqPe1JnkX.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/28/rx8zafbqPe1JnkX.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>此策略将对网络请求使用缓存来响应（如果有），并在后台更新缓存。如果未缓存，它将等待网络响应并使用它。<br>
 这是一个相当安全的策略，因为这意味着用户会定期更新其缓存。这种策略的缺点是：它总是从网络上请求资源，较为浪费用户的带宽。</p>
 <pre><code class="highlight javascript">registerRoute(
@@ -1291,19 +1291,19 @@ workbox.setConfig(&#123;
   <span class="keyword">new</span> workbox.strategies.StaleWhileRevalidate()
 );</code></pre>
 <h3 id="network-first（网络优先）"><a class="anchor" href="#network-first（网络优先）"></a>Network First（网络优先）</h3>
-<p><img src="https://vip2.loli.io/2021/02/28/9ViWk1ZyU4CuDxE.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/28/9ViWk1ZyU4CuDxE.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>此策略将尝试首先从网络获得响应。如果收到响应，它将把它传递给浏览器，并将其保存到缓存中。如果网络请求失败，将使用最后一个缓存的响应。</p>
 <pre><code class="highlight javascript">registerRoute(<span class="keyword">new</span> <span class="built_in">RegExp</span>(matchString), <span class="keyword">new</span> workbox.strategies.NetworkFirst());</code></pre>
 <h3 id="cache-first（缓存优先）"><a class="anchor" href="#cache-first（缓存优先）"></a>Cache First（缓存优先）</h3>
-<p><img src="https://vip1.loli.io/2021/02/28/jkn4Y3mNCRZrSdX.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/28/jkn4Y3mNCRZrSdX.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>此策略将首先检查缓存中是否有响应，如果有响应，则使用该策略。如果请求不在缓存中，则将使用网络，并将任何有效响应添加到缓存中，然后再传递给浏览器。</p>
 <pre><code class="highlight javascript">registerRoute(<span class="keyword">new</span> <span class="built_in">RegExp</span>(matchString), <span class="keyword">new</span> workbox.strategies.CacheFirst());</code></pre>
 <h3 id="network-only（仅网络）"><a class="anchor" href="#network-only（仅网络）"></a>Network Only（仅网络）</h3>
-<p><img src="https://vip2.loli.io/2021/02/28/cQYTlvie1dX8hOF.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/28/cQYTlvie1dX8hOF.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>强制响应来自网络。</p>
 <pre><code class="highlight javascript">registerRoute(<span class="keyword">new</span> <span class="built_in">RegExp</span>(matchString), <span class="keyword">new</span> workbox.strategies.NetworkOnly());</code></pre>
 <h3 id="cache-only（仅缓存）"><a class="anchor" href="#cache-only（仅缓存）"></a>Cache Only（仅缓存）</h3>
-<p><img src="https://vip1.loli.io/2021/02/28/71Sw5tTaBQKl8ri.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/28/71Sw5tTaBQKl8ri.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>强制响应来自缓存。</p>
 <pre><code class="highlight javascript">registerRoute(<span class="keyword">new</span> <span class="built_in">RegExp</span>(matchString), <span class="keyword">new</span> workbox.strategies.CacheOnly());</code></pre>
 <h3 id="策略配置"><a class="anchor" href="#策略配置"></a>策略配置</h3>
@@ -1408,7 +1408,7 @@ core.setCacheNameDetails(&#123;
 );</code></pre>
 <h3 id="图片"><a class="anchor" href="#图片"></a>图片</h3>
 <p>由于我开通了 <a href="http://SM.MS">SM.MS</a> 的 LifeTime Premium VIP ，所以图片当然是要存到这里啦~</p>
-<p><a href="http://SM.MS">SM.MS</a> 的图片域名有这几个：<code>i.loli.net</code>、<code>vip1.loli.net</code>、<code>vip2.loli.net</code>、<code>vip1.loli.io</code>、<code>vip2.loli.io</code>，只需要写一个正则匹配下就好了。</p>
+<p><a href="http://SM.MS">SM.MS</a> 的图片域名有这几个：<code>i.loli.net</code>、<code>vip1.loli.net</code>、<code>vip2.loli.net</code>、<code>s1.baoshuo.ren</code>、<code>s1.baoshuo.ren</code>，只需要写一个正则匹配下就好了。</p>
 <p>由于图片链接对应的文件像 jsDelivr 一样也是几乎永久都不会改变的，所以使用 <code>CacheFirst</code> 来进行缓存。</p>
 <pre><code class="highlight javascript">workbox.routing.registerRoute(
   <span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="string">&#x27;^https://(?:i|vip[0-9])\\.loli\\.(?:io|net)&#x27;</span>),
@@ -1521,14 +1521,14 @@ workbox.routing.registerRoute(
         <link rel="alternate" href="https://blog.baoshuo.ren/post/darkmode/"/>
         <content type="html"><![CDATA[
             
-                <img src="https://vip2.loli.io/2021/02/17/2Ia7ONPMKQDyiBn.png">
+                <img src="https://s1.baoshuo.ren/2021/02/17/2Ia7ONPMKQDyiBn.png">
             
             <p>随着越来越多的操作系统、浏览器开始支持 Dark Mode 和相应的 <a href="https://drafts.csswg.org/mediaqueries-5/#prefers-color-scheme">Media Queries Level 5</a>，越来越多的网站开始添加深色模式。</p>
 <p>我的博客其实早在 2019 年末就支持了深色模式，但一直没有很好地实现这个功能。于是在 2020 年的那个超长寒假，我把博客系统更换到了 Typecho，并与某位大佬一起实现了一个深色模式插件<sup>（原文链接已丢失）</sup>。正好今年寒假把博客换到了 Hexo 上，趁着主题代码还热乎、能看懂，赶紧来写写我的深色模式是如何实现的。</p>
 <span id="more"></span>
-<p><img src="https://vip2.loli.io/2021/02/17/tYEURzvx7LQ4mej.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/17/tYEURzvx7LQ4mej.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="关于深色模式"><a class="anchor" href="#关于深色模式"></a>关于深色模式</h2>
-<p><img src="https://vip2.loli.io/2021/02/17/jXVHb1aAUf5pRhk.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/17/jXVHb1aAUf5pRhk.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>Dark themes reduce the luminance emitted by device screens, while still meeting minimum color contrast ratios. They help improve visual ergonomics by reducing eye strain, adjusting brightness to current lighting conditions, and facilitating screen use in dark environments – all while conserving battery power.</p>
 <blockquote>
 <p><strong>翻译</strong></p>
@@ -1541,7 +1541,7 @@ workbox.routing.registerRoute(
 <p>Google 推荐将深色表面和 100% 白色文字的对比度至少设置为为 15.8:1 （Dark surfaces and 100% white body text have a contrast level of at least 15.8:1）</p>
 <p>为什么呢？因为纯白色会反射所有波长的光线，而纯黑色会吸收所有光线，这是对比度最大的两种颜色，白底黑字时，文字过于刺眼，而黑底白字时，文字又可能难以辨认。如果长时间阅读这样的文字，势必会让眼睛感觉到疲劳，与深色模式开发的初衷背道而驰。</p>
 <p>Google 推荐使用 <code>#121212</code> 来作为深色模式的<strong>主背景色</strong>。</p>
-<img src="https://vip2.loli.io/2021/02/17/QOjZ8D2PnW6wtSN.png" class="" width="700" data-action="zoom">
+<img src="https://s1.u.sb/2021/02/17/QOjZ8D2PnW6wtSN.png" class="" width="700" data-action="zoom">
 <p>A dark theme uses dark grey, rather than black, as the primary surface color for components. Dark grey surfaces can express a wider range of color, elevation, and depth, because it’s easier to see shadows on grey (instead of black).</p>
 <p>Dark grey surfaces also reduce eye strain, as light text on a dark grey surface has less contrast than light text on a black surface.</p>
 <blockquote>
@@ -1553,25 +1553,25 @@ workbox.routing.registerRoute(
 <hr>
 <p><strong>不要让亮色占据过多面积</strong></p>
 <p>在深色主题中应该尽可能地使用有限的颜色进行强调，并使大部分空间显示出深色表面。</p>
-<img src="https://vip2.loli.io/2021/02/17/o1x4jPm92AWECZp.png" class="" width="300" title="正确示例" data-action="zoom">
-<img src="https://vip1.loli.io/2021/02/17/SguCOs4WM5Gqd7I.png" class="" width="300" title="错误示例" data-action="zoom">
+<img src="https://s1.u.sb/2021/02/17/o1x4jPm92AWECZp.png" class="" width="300" title="正确示例" data-action="zoom">
+<img src="https://s1.u.sb/2021/02/17/SguCOs4WM5Gqd7I.png" class="" width="300" title="错误示例" data-action="zoom">
 <hr>
 <p><strong>不要使用过高的色彩饱和度</strong></p>
 <p>在深色模式下，过高的色彩饱和度可能会使文本像下方这样难以辨识（清晰度降低）：</p>
-<p><img src="https://vip1.loli.io/2021/02/17/u16JvHsZBgeFYER.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/17/u16JvHsZBgeFYER.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>色彩饱和度过高还可能会导致文本在深色背景上产生光学振动，从而引起眼睛疲劳。</p>
 <p>最佳做法是使用「去饱和色」，这样可以提高清晰度，并减少视觉抖动。</p>
-<p><img src="https://vip2.loli.io/2021/02/17/YxOwh46ZFNIC5Rg.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/17/YxOwh46ZFNIC5Rg.png" alt="" loading="lazy" data-action="zoom"></p>
 <h3 id="层次"><a class="anchor" href="#层次"></a>层次</h3>
 <p>在浅色模式下，我们通常会使用投影来区分页面内元素的层次，但这种方法在深色模式中如果使用不当，不仅起不到区分页面内元素层次的作用，还会影响整体观感，起到反作用。</p>
 <p>Google 给出的示例：</p>
-<p><img src="https://vip1.loli.io/2021/02/17/O7qzgYK98DGLvCV.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/17/O7qzgYK98DGLvCV.png" alt="" loading="lazy" data-action="zoom"></p>
 <hr>
 <p>WWDC 2019 中苹果设计师讲到深色模式的文本：</p>
-<p><img src="https://vip1.loli.io/2021/02/17/Amac2CMl4bzurYe.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/17/Amac2CMl4bzurYe.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>Apple 认为在浅色模式下投影能轻松地区分两个视觉元素，但是在深色模式下作用甚微。所以他们建议在深色背景下，对前置元素的使用稍亮的灰色。</p>
 <hr>
-<p><img src="https://vip1.loli.io/2021/02/17/OHZqYmAaQDJ9RBe.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/17/OHZqYmAaQDJ9RBe.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>在组件表面<sup>(1)</sup>上放置一个白色半透明的遮罩层<sup>(2)</sup>，就可以体现出深色模式中的层次。</p>
 <h2 id="代码实现"><a class="anchor" href="#代码实现"></a>代码实现</h2>
 <p>这个主题使用了向 <code>body</code> 添加 <code>.dark</code> 类来实现深色模式。</p>
@@ -1868,7 +1868,7 @@ initDarkMode(<span class="keyword">new</span> <span class="built_in">Date</span>
         <link rel="alternate" href="https://blog.baoshuo.ren/post/linux-systemd/"/>
         <content type="html"><![CDATA[
             
-                <img src="https://vip1.loli.io/2021/08/17/bnP7pH3XR6IAx1U.png">
+                <img src="https://s1.baoshuo.ren/2021/08/17/bnP7pH3XR6IAx1U.png">
             
             <p>Systemd 是 Linux 电脑操作系统之下的一套中央化系统及设置管理程序，包括有守护进程、程序库以及应用软件，由 Lennart Poettering 带头开发。其开发目标是提供更优秀的框架以表示系统服务间的依赖关系，并依此实现系统初始化时服务的并行启动，同时达到降低 Shell 的系统开销的效果，最终代替现在常用的 System V 与 BSD 风格 init 程序。</p>
 <span id="more"></span>
@@ -2107,13 +2107,13 @@ initDarkMode(<span class="keyword">new</span> <span class="built_in">Date</span>
 <span class="attr">WantedBy</span>=getty.target
 <span class="attr">DefaultInstance</span>=tty1</code></pre>
 <p>运行 <code>systemctl status getty@tty1.service</code> 命令，可以看到如下图所示的输出：</p>
-<p><img src="https://vip1.loli.io/2021/02/11/lhw1BzOUb7TRDrq.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/11/lhw1BzOUb7TRDrq.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>不难发现图中标橙色的字符与上方配置文件中的 <code>%I</code> 相对应，并且配置文件的名称也不是 <code>getty@tty1.service</code> ，而是 <code>getty@.service</code> ，这种配置文件叫做 「模板实例」 。</p>
 <p>启动时只需要在 <code>@</code> 后面添加需要填入 <code>%I</code> 位置的参数即可，如 <code>getty@tty9.service</code> 。</p>
 <h2 id="target"><a class="anchor" href="#target"></a>Target</h2>
 <p>一般来说，常用的 Target 有两个：一个是 <code>multi-user.target</code> ，表示多用户命令行状态；另一个是 <code>graphical.target</code> ，表示图形用户状态（它依赖于 <code>multi-user.target</code>），这一点和 SysVinit 的运行级别很是相似。</p>
 <p>官方提供了一张非常清晰的 Target 依赖关系图：</p>
-<p><img src="https://vip2.loli.io/2021/02/11/ubmqlLdiGeCtUg7.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/02/11/ubmqlLdiGeCtUg7.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>图源：<a href="https://www.freedesktop.org/software/systemd/man/bootup.html#System%20Manager%20Bootup">https://www.freedesktop.org/software/systemd/man/bootup.html#System Manager Bootup</a></p>
 <h3 id="配置文件-t2"><a class="anchor" href="#配置文件-t2"></a>配置文件</h3>
 <p>以 <code>multi-user.target</code> 这个文件为例子，来简要说明一下 Target 的配置文件中的主要项目：</p>
@@ -2307,20 +2307,20 @@ acme.sh --issue --keylength ec-256 \
 <p>晚上看见机房里的学长们全员 typeracer ，属实被震撼到了。</p>
 <h2 id="day-0"><a class="anchor" href="#day-0"></a>Day 0</h2>
 <p>上午有 rp++ 模拟赛，结果一下子掉了 100 多分 <s>，出题人我真谢谢你</s> 。</p>
-<p><img src="https://vip2.loli.io/2021/10/05/qLdM3Fu6yO1Wirm.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/05/qLdM3Fu6yO1Wirm.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>在线膜拜两位 AK 神仙。</p>
-<p><img src="https://vip2.loli.io/2021/10/05/6kJTM9VxEq2Ryzn.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2021/10/05/6kJTM9VxEq2Ryzn.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>这是为数不多的几次我比 youwike 考得好的模拟赛。</p>
 <p>然后就该收拾东西准备走了。</p>
 <p>下午坐火车去秦皇岛，在车上教练把手机收走了 <s>，过了一会发现没缓存离线题面又把手机要了回来</s> 。</p>
 <p>到了宾馆发现环境还不错，虽然 AzusaCat 和 AlanSP 的屋子正对着工地，但是比别人的都要大。</p>
-<img src="https://vip1.loli.io/2020/12/05/fRagTOlMvx3Gn6B.jpg" class="" width="300" title="选手胸牌" data-action="zoom">
+<img src="https://s1.u.sb/2020/12/05/fRagTOlMvx3Gn6B.jpg" class="" width="300" title="选手胸牌" data-action="zoom">
 <p>开会的时候教练们讲了讲注意事项，顺便替我们把选手胸牌领了回来。</p>
 <p>晚上吃完饭，写了两个板子，颓废到 12 点才睡，羡慕 AlanSP 的健康作息。</p>
-<img src="https://vip2.loli.io/2020/12/13/5ePKrZ7Oy8Lj6fc.jpg" class="" width="250" title="youwike 在考前立的 flag" data-action="zoom">
+<img src="https://s1.u.sb/2020/12/13/5ePKrZ7Oy8Lj6fc.jpg" class="" width="250" title="youwike 在考前立的 flag" data-action="zoom">
 <p>可惜 youwike 最后还是没上二百。</p>
 <h2 id="day-1-t2"><a class="anchor" href="#day-1-t2"></a>Day 1</h2>
-<p><img src="https://vip1.loli.io/2020/12/05/NQ4JYSWf5cXt3U6.jpg" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/12/05/NQ4JYSWf5cXt3U6.jpg" alt="" loading="lazy" data-action="zoom"></p>
 <p>比赛前照了一张合影。</p>
 <p>打开题目发现 T1 可做，写了写调了调，过了样例。拿大样例测了下发现没开 long long ，开了就过了。</p>
 <p>然后就去看其他题，并没有什么思路，于是水了水能水的暴力，骗了骗能骗的分。</p>
@@ -2391,7 +2391,7 @@ data = json.loads(getUploadedImages(sys.argv[<span class="number">1</span>]))
 <h2 id="爬取题目信息"><a class="anchor" href="#爬取题目信息"></a>爬取题目信息</h2>
 <h3 id="题目数据获取"><a class="anchor" href="#题目数据获取"></a>题目数据获取</h3>
 <p>先使用 <code>curl</code> 获取洛谷的题目页面：</p>
-<p><img src="https://vip1.loli.io/2020/11/26/JageUdcpXTthIjM.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/JageUdcpXTthIjM.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>可以看出我们需要的数据都在传入给 <code>decodeURIComponent()</code> 函数的字符串中，正则匹配取出即可。</p>
 <p>下面是代码实现：</p>
 <pre><code class="highlight python"><span class="comment">#!/usr/bin/python3</span>
@@ -2555,10 +2555,10 @@ col = luogudb[<span class="string">&quot;problem&quot;</span>]</code></pre>
 <p>直接运行下方命令导出为 JSON 格式即可。</p>
 <pre><code class="highlight bash">mongoexport -d luogu -c problem -o /data/db/problem.json</code></pre>
 <p>或者点击对应数据库管理界面中的 <code>[JSON]</code> 按钮导出。</p>
-<p><img src="https://vip2.loli.io/2020/11/26/hXtVAynYGcb8B71.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/hXtVAynYGcb8B71.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="成果"><a class="anchor" href="#成果"></a>成果</h2>
 <p>断断续续爬了一个多星期，终于爬完了。</p>
-<p><img src="https://vip1.loli.io/2020/11/26/7muojQZM125gWXL.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/7muojQZM125gWXL.png" alt="" loading="lazy" data-action="zoom"></p>
 
         ]]></content>
         <summary type="html"><![CDATA[<p>截至目前，洛谷已经有了近两万道题目和四十余万名用户。本代码爬取了一些样本，以供后续（可能）的数据分析。</p>]]></summary>
@@ -2618,27 +2618,27 @@ git filter-branch --env-filter <span class="string">&#x27;</span>
 <h2 id="web"><a class="anchor" href="#web"></a>web</h2>
 <h3 id="签到题"><a class="anchor" href="#签到题"></a>签到题</h3>
 <p>web 题当然要先看源码了（出题人好恶毒啊）</p>
-<p><img src="https://vip1.loli.io/2020/11/25/FqvWiXe4DIzLnr3.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/FqvWiXe4DIzLnr3.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>再就是改值、提交</p>
-<p><img src="https://vip1.loli.io/2020/11/25/dnqM5sTKEQlIC9w.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/dnqM5sTKEQlIC9w.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>so easy~</p>
-<p><img src="https://vip2.loli.io/2020/11/25/8kSKomN217XJUEY.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/8kSKomN217XJUEY.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>flag 获取成功：<code>flag&#123;hR6Ku81-HappyHacking2020-35a790fff0&#125;</code></p>
 <h3 id="2048"><a class="anchor" href="#2048"></a>2048</h3>
 <p>首先 F12 看下源码，看到了一个有趣的东西</p>
-<p><img src="https://vip2.loli.io/2020/11/25/dJXolhVqNvwSPjs.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/dJXolhVqNvwSPjs.png" alt="" loading="lazy" data-action="zoom"></p>
 <p><s>这么好的东西当然要拖到 console 里面去啊</s></p>
-<p><img src="https://vip2.loli.io/2020/11/25/bsvZc4H8D2JWBAz.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/bsvZc4H8D2JWBAz.png" alt="" loading="lazy" data-action="zoom"></p>
 <blockquote>
 <p>小彩蛋：JavaScript 中 String 类型转换成数字类型时会得到 <code>NaN</code>，凑成了 <code>banana</code> 。</p>
 </blockquote>
 <p>然后就出来了此题的 「flxg」</p>
-<p><img src="https://vip1.loli.io/2020/11/25/Nf5gw3cM8opAQ9U.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/Nf5gw3cM8opAQ9U.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>flxg 获取成功：<code>flxg&#123;8G6so5g-FLXG-7b77994fc5&#125;</code></p>
 <h2 id="general"><a class="anchor" href="#general"></a>general</h2>
 <h3 id="一闪而过的-flag"><a class="anchor" href="#一闪而过的-flag"></a>一闪而过的 Flag</h3>
 <p>直接打开是会闪，但是，你闪归你闪，我直接用 cmd 打开，你总不能 <s>把我 cmd 窗口关掉吧</s> 还继续闪吧</p>
-<p><img src="https://vip2.loli.io/2020/11/25/KavlGwSQoVqi4PZ.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/KavlGwSQoVqi4PZ.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>flag 获取成功：<code>flag&#123;Are_you_eyes1ght_g00D?_can_you_dIst1nguish_1iI?&#125;</code></p>
 <h3 id="猫咪问答"><a class="anchor" href="#猫咪问答"></a>猫咪问答++</h3>
 <blockquote>
@@ -2658,7 +2658,7 @@ git filter-branch --env-filter <span class="string">&#x27;</span>
 <li>中国科学技术大学第六届信息安全大赛所有人合计提交了多少次 flag？</li>
 </ol>
 </blockquote>
-<p><img src="https://vip2.loli.io/2020/11/25/t3di51gVr2R7yvS.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/t3di51gVr2R7yvS.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>至于剩下的… 懒得找了，直接暴力吧</p>
 <blockquote>
 <ol>
@@ -2671,14 +2671,14 @@ Docker，Golang，Python，Plan 9，PHP，GNU，LLVM，Swift，Perl，GitHub，T
 <li>中国科学技术大学西校区图书馆正前方（西南方向） 50 米 L 型灌木处共有几个连通的划线停车位？</li>
 </ol>
 </blockquote>
-<p><img src="https://vip2.loli.io/2020/11/25/7YmcOir9tS5xZ28.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/7YmcOir9tS5xZ28.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>附上代码：</p>
 <pre><code class="highlight bash"><span class="keyword">for</span>((i=1;i&lt;=23;i=(<span class="variable">$i</span>+1))); <span class="keyword">do</span> <span class="keyword">for</span>((j=1;j&lt;=30;j=(<span class="variable">$j</span>+1))); <span class="keyword">do</span> <span class="built_in">echo</span> <span class="string">&quot;[<span class="variable">$i</span>, <span class="variable">$j</span>] <span class="subst">$(curl -s &#x27;http://202.38.93.111:10001/&#x27; --data <span class="string">&quot;q1=<span class="variable">$i</span>&amp;q2=256&amp;q3=9&amp;q4=<span class="variable">$j</span>&amp;q5=17098&quot;</span> -H <span class="string">&quot;Cookie: PHPSESSID=******; session=******&quot;</span> | grep &#x27;flag.*&#x27;)</span>&quot;</span> ; <span class="keyword">done</span> ; <span class="keyword">done</span></code></pre>
 <p>flag 获取成功：<code>flag&#123;b4a31f2a_G00G1e_1s_y0ur_fr13nd_228b608a32&#125;</code></p>
 <h3 id="233-同学的-docker"><a class="anchor" href="#233-同学的-docker"></a>233 同学的 Docker</h3>
-<p><img src="https://vip2.loli.io/2020/11/25/pP5dvYI8Tz49QLB.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/pP5dvYI8Tz49QLB.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>众所周知，Docker 镜像是分层存储的，所以这道题可以很轻松地解出来。</p>
-<p><img src="https://vip2.loli.io/2020/11/25/im2bTZqAMNJPf5d.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/im2bTZqAMNJPf5d.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>先 pull 下来镜像。</p>
 <pre><code class="highlight shell">docker inspect 8b8d3c8324c7/stringtool</code></pre>
 <p>然后查看镜像的元信息，下面是简化版的结果（json 格式）</p>
@@ -2705,9 +2705,9 @@ Docker，Golang，Python，Plan 9，PHP，GNU，LLVM，Swift，Perl，GitHub，T
   &#125;
 ]</code></pre>
 <p>查看 diff 文件夹：</p>
-<p><img src="https://vip2.loli.io/2020/11/25/IxlmEhSfRUPKy6G.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/IxlmEhSfRUPKy6G.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>然后就能看到文件内容了~</p>
-<p><img src="https://vip2.loli.io/2020/11/25/eLq2mSpCi68wVZQ.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/25/eLq2mSpCi68wVZQ.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>flag 获取成功：<code>flag&#123;Docker_Layers!=PS_Layers_hhh&#125;</code></p>
 
         ]]></content>
@@ -2724,16 +2724,16 @@ Docker，Golang，Python，Plan 9，PHP，GNU，LLVM，Swift，Perl，GitHub，T
         <link rel="alternate" href="https://blog.baoshuo.ren/post/bilibili-1024-ctf-write-up/"/>
         <content type="html"><![CDATA[
             
-                <img src="https://vip1.loli.io/2020/12/01/cZoPxLHXlkFSjrt.jpg">
+                <img src="https://s1.baoshuo.ren/2020/12/01/cZoPxLHXlkFSjrt.jpg">
             
             <p>比赛地址： <a href="https://security.bilibili.com/sec1024/">https://security.bilibili.com/sec1024/</a></p>
 <h2 id="t1：页面的背后是什么？"><a class="anchor" href="#t1：页面的背后是什么？"></a>T1：页面的背后是什么？</h2>
 <p><s>F12 解决一切问题</s></p>
-<p><img src="https://vip2.loli.io/2020/11/28/XrLpIf2OHs4YAxJ.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/XrLpIf2OHs4YAxJ.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="t2：真正的秘密只有特殊的设备才能看到"><a class="anchor" href="#t2：真正的秘密只有特殊的设备才能看到"></a>T2：真正的秘密只有特殊的设备才能看到</h2>
 <p>改下 UA 就行了，轻松到手</p>
-<p><img src="https://vip2.loli.io/2020/11/28/WPLCUHNYiE2nFwJ.png" alt="" loading="lazy" data-action="zoom"></p>
-<p><img src="https://vip2.loli.io/2020/11/28/83GrjFbTwJf1BHn.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/WPLCUHNYiE2nFwJ.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/83GrjFbTwJf1BHn.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="t3：密码是啥？"><a class="anchor" href="#t3：密码是啥？"></a>T3：密码是啥？</h2>
 <p>看了看源码，没啥思路，最后随便试了试 <code>admin</code> <code>root</code> <code>bilibili</code> 什么的，竟然是对的。</p>
 <ul>
@@ -2741,35 +2741,35 @@ Docker，Golang，Python，Plan 9，PHP，GNU，LLVM，Swift，Perl，GitHub，T
 <li>密码 <code>bilibili</code></li>
 </ul>
 <p>另外，你告诉我什么是 <strong>falg</strong> ？</p>
-<p><img src="https://vip1.loli.io/2020/11/28/eg9kBtR1aQizGYE.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/eg9kBtR1aQizGYE.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="t4：对不起，权限不足～"><a class="anchor" href="#t4：对不起，权限不足～"></a>T4：对不起，权限不足～</h2>
 <p>第一次访问：</p>
-<p><img src="https://vip1.loli.io/2020/11/28/roVjXTfs4v8ibP5.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/roVjXTfs4v8ibP5.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>第二次访问：</p>
-<p><img src="https://vip1.loli.io/2020/11/28/RpEsGn8c9KY16MH.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/RpEsGn8c9KY16MH.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>查看源码可以发现有个 API 请求，查看请求数据得到以下信息。</p>
-<p><img src="https://vip1.loli.io/2020/11/28/nhF7pCTQsVYxKdj.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/nhF7pCTQsVYxKdj.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>role 里面的东西，贴进谷歌一搜就知道它是 <code>user</code> 的 MD5 。</p>
 <p>和超级管理员相关的名字相信大家都知道，无非就是 <code>admin</code> <code>Administrator</code> <code>root</code> 之类的东西。</p>
 <p>挨个试，最后发现 <code>Administrator</code> 是正确的。</p>
 <pre><code class="highlight shell">curl &quot;http://45.113.201.36/api/ctf/4&quot; --cookie &quot;role=7b7bc2512ee1fedcd76bdc68926d4f7b; session=***;&quot;</code></pre>
-<p><img src="https://vip1.loli.io/2020/11/28/gEhkmTJrnaoMwPv.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/gEhkmTJrnaoMwPv.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="t5：别人的秘密"><a class="anchor" href="#t5：别人的秘密"></a>T5：别人的秘密</h2>
-<p><img src="https://vip1.loli.io/2020/11/28/c4BjYs3nVuCpxmH.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/c4BjYs3nVuCpxmH.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>发现有个 API，还有个 UID。</p>
 <p>最开始没想到需要从代码里面的&quot;初始 UID&quot;开始扫，浪费了我好多时间。</p>
 <pre><code class="highlight shell">for ((i=100336889;$i&lt;9999999999;i=($i+1))); do echo -e &quot;[$i] \c&quot; &amp;&amp; curl &quot;http://45.113.201.36/api/ctf/5?uid=$&#123;i&#125;&quot; -H &#x27;User-Agent: bilibili Security Browser&#x27; -H &#x27;Cookie: session=*****; role=ee11cbb19052e40b07aac0ca060c23ee&#x27; ; done</code></pre>
-<p><img src="https://vip1.loli.io/2020/11/28/m1Hr4u8FOJe7ycI.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/m1Hr4u8FOJe7ycI.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="t6-t10：结束亦是开始，接下来的旅程，需要少年自己去探索啦～"><a class="anchor" href="#t6-t10：结束亦是开始，接下来的旅程，需要少年自己去探索啦～"></a>T6~T10：结束亦是开始，接下来的旅程，需要少年自己去探索啦～</h2>
 <p>先扫了扫端口，发现有个 redis</p>
-<p><img src="https://vip2.loli.io/2020/11/28/E29tLxSiC6Qzn5O.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/E29tLxSiC6Qzn5O.png" alt="" loading="lazy" data-action="zoom"></p>
 <pre><code class="highlight shell">redis-cli -h 120.92.151.189 -p 6379</code></pre>
 <p>登上去看看，发现了第八题的 flag 。</p>
-<p><img src="https://vip1.loli.io/2020/11/28/Oo5vyeEsChmSt2H.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/Oo5vyeEsChmSt2H.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>然后爆破下目录</p>
-<p><img src="https://vip1.loli.io/2020/11/28/QEnxZsg8FpiOKwm.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/QEnxZsg8FpiOKwm.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>有个 test.php ，访问下发现是个 JSfuck 加密，丢进浏览器里面解密下</p>
-<p><img src="https://vip1.loli.io/2020/11/28/G7TWPndrhqBmvAI.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/G7TWPndrhqBmvAI.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>程序员最多的地方，那就肯定是 Github 了。</p>
 <p>然后找到了一个仓库 <a href="https://github.com/interesting-1024/end">interesting-1024/end</a></p>
 <p>有个 <code>end.php</code></p>
@@ -2796,9 +2796,9 @@ Docker，Golang，Python，Plan 9，PHP，GNU，LLVM，Swift，Perl，GitHub，T
 &#125;
 <span class="meta">?&gt;</span></code></pre>
 <p>然后需要构造出一个 符合 <code>!is_numeric($_GET['id']) and preg_match('/\d/is', $_GET['id']) !== 1 and intval($_GET['id']) === 1</code> 的请求即可。</p>
-<p><img src="https://vip1.loli.io/2020/11/28/mCIevr1HSMBpkdi.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/mCIevr1HSMBpkdi.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>可以得到一个图片的链接 <code>http://45.113.201.36/blog/imgs/bilibili_224a634752448def6c0ec064e49fe797_havefun.jpg</code></p>
-<p><img src="https://vip2.loli.io/2020/11/28/iXEgYzjPtH2NhQw.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/28/iXEgYzjPtH2NhQw.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>这个图片的末尾就是第十个 flag 了（图中标蓝的地方）。</p>
 
         ]]></content>
@@ -2823,7 +2823,7 @@ Docker，Golang，Python，Plan 9，PHP，GNU，LLVM，Swift，Perl，GitHub，T
 apt upgrade -y
 apt install nginx libnginx-mod-rtmp -y</code></pre>
 <p>访问服务器 IP ，出现如下图所示网页即代表安装成功。</p>
-<p><img src="https://vip1.loli.io/2020/11/26/BdKOhDuxIaYks6q.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/BdKOhDuxIaYks6q.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="修改-nginx-配置"><a class="anchor" href="#修改-nginx-配置"></a>修改 nginx 配置</h2>
 <p>打开 <code>/etc/nginx/nginx.conf</code> ，在末尾处插入下面的配置</p>
 <pre><code class="highlight nginx"><span class="section">rtmp</span> &#123;
@@ -2921,7 +2921,7 @@ apt install nginx libnginx-mod-rtmp -y</code></pre>
 nginx: configuration <span class="keyword">file</span> /etc/nginx/nginx.<span class="keyword">conf</span> test <span class="keyword">is</span> successful</code></pre>
 <p>当出现成功提示时，使用 <code>nginx -s reload</code> 平滑重启 nginx。</p>
 <p>重启成功后使用 <code>netstat -lnp</code> 查看 <code>tcp/1935</code> 端口是否开启。</p>
-<p><img src="https://vip1.loli.io/2020/11/26/Xy3Nq5WZaogLIvR.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/Xy3Nq5WZaogLIvR.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="使用-obs-连接直播服务器"><a class="anchor" href="#使用-obs-连接直播服务器"></a>使用 OBS 连接直播服务器</h2>
 <p>打开 OBS ，在 设置 -&gt; 推流 中配置以下内容</p>
 <table>
@@ -2949,11 +2949,11 @@ nginx: configuration <span class="keyword">file</span> /etc/nginx/nginx.<span cl
 <p>其中，<code>$&#123;ip&#125;</code> 和 <code>$&#123;key&#125;</code> 设置为你需要的值即可。</p>
 <p>回到主界面，点击 <strong>开始推流</strong> 进行推流。</p>
 <h2 id="使用客户端拉取直播流"><a class="anchor" href="#使用客户端拉取直播流"></a>使用客户端拉取直播流</h2>
-<p><img src="https://vip2.loli.io/2020/11/26/jpqVTAgXSW6oyEP.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/jpqVTAgXSW6oyEP.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>在 <code>PotPlayer</code> <code>QQ影音</code> 等播放器中选择 <code>打开-&gt;打开URL</code> 。</p>
-<p><img src="https://vip1.loli.io/2020/11/26/rzBNukVTntf5xUR.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/rzBNukVTntf5xUR.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>输入 <code>http://$&#123;ip&#125;/live/$&#123;key&#125;/index.m3u8</code> ，点击确定。</p>
-<p><img src="https://vip1.loli.io/2020/11/26/crbEBQNC3qH8uOl.jpg" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/crbEBQNC3qH8uOl.jpg" alt="" loading="lazy" data-action="zoom"></p>
 <p>此时可以就看到直播画面了。</p>
 <h2 id="网页端播放"><a class="anchor" href="#网页端播放"></a>网页端播放</h2>
 <p>页面中只有一个播放器，其他功能请自行实现。</p>
@@ -2981,7 +2981,7 @@ nginx: configuration <span class="keyword">file</span> /etc/nginx/nginx.<span cl
 <span class="tag">&lt;/<span class="name">body</span>&gt;</span>
 
 <span class="tag">&lt;/<span class="name">html</span>&gt;</span></code></pre>
-<p><img src="https://vip1.loli.io/2020/11/26/9X6mUtF4fLzdaYn.jpg" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/9X6mUtF4fLzdaYn.jpg" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="后记"><a class="anchor" href="#后记"></a>后记</h2>
 <p>如果没有在外直播的需求，不要将 rtmp 端口映射至公网，这可能会带来一些不必要的麻烦。</p>
 <h2 id="参考资料"><a class="anchor" href="#参考资料"></a>参考资料</h2>
@@ -3004,25 +3004,25 @@ nginx: configuration <span class="keyword">file</span> /etc/nginx/nginx.<span cl
             <h2 id="前言"><a class="anchor" href="#前言"></a>前言</h2>
 <p>良心云果然是良心云，增加了一个 IP 四舍五入居然不要钱，不过还是要登进系统配置一下双 IP 的。</p>
 <span id="more"></span>
-<p><img src="https://vip2.loli.io/2020/11/26/rAyvBmDw2bdMP6t.jpg" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/rAyvBmDw2bdMP6t.jpg" alt="" loading="lazy" data-action="zoom"></p>
 <p>和客服的对话</p>
 <h2 id="增加网卡-公网-ip"><a class="anchor" href="#增加网卡-公网-ip"></a>增加网卡&amp;公网 IP</h2>
-<p><img src="https://vip2.loli.io/2020/11/26/SWwlbLRaHACnuBz.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/SWwlbLRaHACnuBz.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>点击按钮新建一个弹性网卡并绑定</p>
-<p><img src="https://vip1.loli.io/2020/11/26/sJqBfdbv4eRzZFm.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/sJqBfdbv4eRzZFm.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>绑定完以后可以在服务器的弹性网卡管理页面看到详情</p>
-<p><img src="https://vip1.loli.io/2020/11/26/ivPFgfH69XTCo8Z.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/ivPFgfH69XTCo8Z.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>点击新建的弹性网卡，进入管理页面，并记录下这张网卡的<strong>内网 IP</strong>，稍后会用到</p>
-<p><img src="https://vip1.loli.io/2020/11/26/FAy8U5lpzNtuMTi.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/FAy8U5lpzNtuMTi.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>点击绑定按钮，并申请一个弹性公网 IP</p>
-<p><img src="https://vip2.loli.io/2020/11/26/AbZ4vTwr1UCdz2n.png" alt="" loading="lazy" data-action="zoom">
-<img src="https://vip2.loli.io/2020/11/26/2G5jsdTSZrocqwh.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/AbZ4vTwr1UCdz2n.png" alt="" loading="lazy" data-action="zoom">
+<img src="https://s1.u.sb/2020/11/26/2G5jsdTSZrocqwh.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>此时弹性公网 IP 已经绑定成功，并且可以看到已经变为不收取 IP 资源费的状态了</p>
-<p><img src="https://vip1.loli.io/2020/11/26/x8q7I5E2dMSDt4B.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/x8q7I5E2dMSDt4B.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>查看主网卡的<strong>内网 IP</strong>，并记录下这个 IP，稍后会用到</p>
 <h2 id="配置服务器的网络设置"><a class="anchor" href="#配置服务器的网络设置"></a>配置服务器的网络设置</h2>
 <p>使用 <code>ip addr</code> 查看网卡名称，并记录下来</p>
-<p><img src="https://vip2.loli.io/2020/11/26/Ofh8CzvnYKPGsH7.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/Ofh8CzvnYKPGsH7.png" alt="" loading="lazy" data-action="zoom"></p>
 <p>切换到网卡配置文件目录</p>
 <pre><code class="highlight bash"><span class="built_in">cd</span> /etc/sysconfig/network-scripts/</code></pre>
 <p>编辑 <code>ifcfg-eth0</code> 文件，将下方内容修改后填入</p>
@@ -3051,7 +3051,7 @@ nginx: configuration <span class="keyword">file</span> /etc/nginx/nginx.<span cl
 </ul>
 <p>保存后重启网络服务。</p>
 <pre><code class="highlight bash">service network restart</code></pre>
-<p><img src="https://vip1.loli.io/2020/11/26/ReBSM4C9oF2HbVi.png" alt="" loading="lazy" data-action="zoom"></p>
+<p><img src="https://s1.u.sb/2020/11/26/ReBSM4C9oF2HbVi.png" alt="" loading="lazy" data-action="zoom"></p>
 <h2 id="配置路由（可选）"><a class="anchor" href="#配置路由（可选）"></a>配置路由（可选）</h2>
 <blockquote>
 <p>按照上述步骤配置好后，Linux 还是默认都从主网卡发包。

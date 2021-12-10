@@ -2,16 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://blog.baoshuo.ren/about/</loc>
+    <loc>https://blog.baoshuo.ren/post/my-own-asn/</loc>
     
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://blog.baoshuo.ren/post/my-own-asn/</loc>
+    <loc>https://blog.baoshuo.ren/about/</loc>
     
     <lastmod>2021-12-09</lastmod>
     
@@ -22,7 +22,7 @@
   <url>
     <loc>https://blog.baoshuo.ren/post/auto-deploy-static-blog/</loc>
     
-    <lastmod>2021-11-11</lastmod>
+    <lastmod>2021-11-10</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -274,7 +274,7 @@
 
   <url>
     <loc>https://blog.baoshuo.ren/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -282,189 +282,189 @@
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/Hexo/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/GitHub-Actions/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/Vercel/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/Netlify/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/Cloudflare/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/CTF/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/Bilibili/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/BIRD/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/BGP/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/DN42/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/Git/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/Web/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/HTTP/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/JavaScript/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/%E5%89%8D%E7%AB%AF/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/Typecho/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/%E6%8A%98%E8%85%BE/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/Linux/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/%E7%AC%94%E8%AE%B0%E6%9C%AC/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/VMware/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/%E6%B8%B8%E8%AE%B0/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/%E8%85%BE%E8%AE%AF%E4%BA%91/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/Hackergame/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/macOS/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/ServiceWorker/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
@@ -473,21 +473,21 @@
   
   <url>
     <loc>https://blog.baoshuo.ren/categories/%E7%AC%94%E8%AE%B0%E6%9C%AC/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/categories/%E6%8A%80%E6%9C%AF%E5%90%91/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://blog.baoshuo.ren/categories/%E4%B9%90%E7%94%9F%E6%B4%BB/</loc>
-    <lastmod>2021-12-09</lastmod>
+    <lastmod>2021-12-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
