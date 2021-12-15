@@ -4,7 +4,7 @@
   <url>
     <loc>https://blog.baoshuo.ren/about/</loc>
     
-    <lastmod>2021-12-14</lastmod>
+    <lastmod>2021-12-15</lastmod>
     
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -407,13 +407,6 @@
   </url>
   
   <url>
-    <loc>https://blog.baoshuo.ren/tags/Linux/</loc>
-    <lastmod>2021-12-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.baoshuo.ren/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</loc>
     <lastmod>2021-12-15</lastmod>
     <changefreq>weekly</changefreq>
@@ -422,6 +415,13 @@
   
   <url>
     <loc>https://blog.baoshuo.ren/tags/%E7%AC%94%E8%AE%B0%E6%9C%AC/</loc>
+    <lastmod>2021-12-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.baoshuo.ren/tags/Linux/</loc>
     <lastmod>2021-12-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>

@@ -60,9 +60,9 @@ https://blog.baoshuo.ren/tags/JavaScript/
 https://blog.baoshuo.ren/tags/%E5%89%8D%E7%AB%AF/
 https://blog.baoshuo.ren/tags/Typecho/
 https://blog.baoshuo.ren/tags/%E6%8A%98%E8%85%BE/
-https://blog.baoshuo.ren/tags/Linux/
 https://blog.baoshuo.ren/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/
 https://blog.baoshuo.ren/tags/%E7%AC%94%E8%AE%B0%E6%9C%AC/
+https://blog.baoshuo.ren/tags/Linux/
 https://blog.baoshuo.ren/tags/VMware/
 https://blog.baoshuo.ren/tags/%E6%B8%B8%E8%AE%B0/
 https://blog.baoshuo.ren/tags/%E8%85%BE%E8%AE%AF%E4%BA%91/
