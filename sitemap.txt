@@ -4,6 +4,7 @@ https://blog.baoshuo.ren/categories/
 https://blog.baoshuo.ren/friends/
 https://blog.baoshuo.ren/search/
 https://blog.baoshuo.ren/tags/
+https://blog.baoshuo.ren/post/goodbye-2021/
 https://blog.baoshuo.ren/post/auto-deploy-static-blog/
 https://blog.baoshuo.ren/post/ustc-hackergame-2021-write-up/
 https://blog.baoshuo.ren/post/cors/
@@ -58,6 +59,7 @@ https://blog.baoshuo.ren/tags/Web/
 https://blog.baoshuo.ren/tags/HTTP/
 https://blog.baoshuo.ren/tags/JavaScript/
 https://blog.baoshuo.ren/tags/%E5%89%8D%E7%AB%AF/
+https://blog.baoshuo.ren/tags/%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/
 https://blog.baoshuo.ren/tags/Typecho/
 https://blog.baoshuo.ren/tags/%E6%8A%98%E8%85%BE/
 https://blog.baoshuo.ren/tags/Linux/
