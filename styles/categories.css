@@ -1,2 +1,2 @@
-/* Baoshuo's Blog | Build: 21745a0 | Baoshuo ( https://baoshuo.ren ) */
+/* Baoshuo's Blog | Build: 9f1acc6 | Baoshuo ( https://baoshuo.ren ) */
 .categories-list{display:flex;flex-wrap:wrap;justify-content:center}.categories-list .categories-list-item{display:flex;justify-content:space-between;padding:1.5rem 2rem;margin:.5rem;border-radius:var(--br);background:var(--bg-c);width:48%}@media (max-width:1023px){.categories-list .categories-list-item{width:100%}}.categories-list .categories-list-item .categories-list-item-name{color:var(--text);font-size:1.25em}.categories-list .categories-list-item .categories-list-item-count{color:var(--text);text-align:right;align-self:center}
