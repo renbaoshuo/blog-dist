@@ -136,4 +136,8 @@
     <loc>https://blog.baoshuo.ren/about/</loc>
     <changefreq>monthly</changefreq>
   </url>
+  <url>
+    <loc>https://blog.baoshuo.ren/privacy-policy/</loc>
+    <changefreq>monthly</changefreq>
+  </url>
 </urlset>
