@@ -2,13 +2,24 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://blog.baoshuo.ren</id>
     <title>宝硕博客</title>
-    <updated>2022-04-28T23:42:39.082Z</updated>
+    <updated>2022-04-30T02:38:19.583Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <author>
         <name>宝硕</name>
         <uri>https://baoshuo.ren</uri>
     </author>
     <link rel="alternate" href="https://blog.baoshuo.ren"/>
+    <entry>
+        <title type="html"><![CDATA[强制卸载三星应用分身中的残留应用]]></title>
+        <id>/post/uninstall-samsung-extra-dual-app/</id>
+        <link href="/post/uninstall-samsung-extra-dual-app/"/>
+        <updated>2022-04-30T01:40:32.000Z</updated>
+        <content type="html"><![CDATA[<p>前一阵子不小心手抖把手机里的 Chrome 卸载了，然后就装不上了。</p><img src="https://s1.baoshuo.ren/2022/04/30/6Y5HdtnT4fKrcxZ.jpg" width="350"><p>▲ 安装时的报错信息</p><p>这个迷惑的报错信息误导了我很长时间，再加上我在学校里拿不到手机，于是 3 月初的问题一直拖到了 4 月底才解决。</p><p>拿到手机之后我突然想看看手机里有什么不再需要的应用需要卸载，清理清理手机的存储空间。于是我翻到了这么一个应用：</p><img src="https://s1.baoshuo.ren/2022/04/30/TvSn9tKzrZ5qifx.jpg" width="350"><p>▲ 应用图标右下角的橙色标志代表了这是一个安装在应用分身中的应用</p><p>但是我手机里的应用分身只能安装两个应用：微信和 QQ。所以问题应该就是出在了这里。我试着点击了下方的「卸载」按钮，但提示卸载成功并重启后，这个 Chrome 浏览器依然静静地呆在手机里，丝毫没有要离开的意思。</p><p>我在网上找到了一篇名为《<a href="https://www.sizau.com/a/one-ui-dual-app.html" rel="external nofollow noreferrer">技术 | One UI 不熔断，让应用分身双开任何应用</a>》的文章，里面讲解了如何在应用分身中安装其他应用的方法，还提到了应用分身其实是以 Android 多用户的形式实现的，分身中的所有应用都安装在了名为 <code>DUAL_APP</code> 的用户下。知道了这些信息，事情就好办得多了，直接用 ADB 把它搞掉就行了（<a href="https://developer.android.com/studio/releases/platform-tools#downloads" rel="external nofollow noreferrer">ADB 下载地址</a>）。</p><p><a href="https://publish.samsungsimulator.com/simulator/418c1904-4e51-4517-bee3-334744957266/#!topic/%E8%AE%BE%E7%BD%AE%E8%8F%9C%E5%8D%95/%E5%BC%80%E5%90%AF%E5%BC%80%E5%8F%91%E8%80%85%E9%80%89%E9%A1%B9" rel="external nofollow noreferrer">在手机上开启开发者模式</a> 后，在「开发者选项」中允许「USB 调试」，然后使用数据线将手机连接到电脑，这样就可以在电脑上通过 ADB 操控手机了。</p><p>使用下面的命令来查看手机中的用户列表：</p><pre><code class="hljs shell">adb shell pm list users</code></pre><p><img src="https://s1.baoshuo.ren/2022/04/30/9PDszfwVaoT8NCQ.png" alt="" loading="lazy"></p><p>▲ 图中被红色方框框住的就是应用分身对应的用户了</p><p>然后使用下面的命令来查看分身中的应用列表：</p><pre><code class="hljs shell">adb shell pm list packages --user 95</code></pre><p><img src="https://s1.baoshuo.ren/2022/04/30/F3rhWgUpY4evMZa.png" alt="" loading="lazy"></p><p>▲ 图中被红色方框框住的就是应用分身中的 Chrome 浏览器的包名了</p><p>那么就可以卸载分身中的 Chrome 浏览器了：</p><pre><code class="hljs shell">adb uninstall --user 95 com.android.chrome</code></pre><p><img src="https://s1.baoshuo.ren/2022/04/30/HInGCjd4JRuUrwT.png" alt="" loading="lazy"></p><p>卸载完成后，就可以通过你喜欢的方式安装应用了。我这里同样使用了 ADB 来进行 Chrome 浏览器的安装操作：</p><pre><code class="hljs shell">adb install &quot;com.android.chrome_101.0.4951.41-495104123.apk&quot;</code></pre><p><img src="https://s1.baoshuo.ren/2022/04/30/yNFCt7fqYPAoDBO.png" alt="" loading="lazy"></p><p>最后不要忘记关掉「USB 调试」功能，以免产生安全风险。</p>]]></content>
+        <author>
+            <name>宝硕</name>
+            <uri>https://baoshuo.ren</uri>
+        </author>
+    </entry>
     <entry>
         <title type="html"><![CDATA[2022 年常中集训游记]]></title>
         <id>/post/travel-scz-2022/</id>
@@ -1115,18 +1126,6 @@ ssl_prefer_server_ciphers on;</code></pre><h2 id="将博客文件同步到服务
           <span class="hljs-attr">REMOTE_HOST:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.REMOTE_HOST</span> <span class="hljs-string">&#125;&#125;</span>
           <span class="hljs-attr">REMOTE_USER:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.REMOTE_USER</span> <span class="hljs-string">&#125;&#125;</span>
           <span class="hljs-attr">TARGET:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.TARGET</span> <span class="hljs-string">&#125;&#125;</span></code></pre><p>之后在 <code>https://github.com/&#123;username&#125;/&#123;repo&#125;/settings/secrets/actions</code> 中添加四个 Secrets 。</p><table><thead><tr><th>名称</th><th>内容</th></tr></thead><tbody><tr><td>REMOTE_HOST</td><td>服务器 IP 地址</td></tr><tr><td>REMOTE_USER</td><td>服务器用户名</td></tr><tr><td>SSH_PRIVATE_KEY</td><td>连接到服务器的 SSH 私钥</td></tr><tr><td>TARGET</td><td>存放文件的路径</td></tr></tbody></table><p>将博客文件 push 到仓库中，就能在服务器上查看到文件了。</p><h2 id="参考资料-5">参考资料</h2><ol><li><a href="https://ssl-config.mozilla.org/#server=nginx&amp;version=1.18.0&amp;config=modern&amp;openssl=1.1.1f&amp;ocsp=false&amp;guideline=5.6" rel="external nofollow noreferrer">nginx 1.18.0, modern config, OpenSSL 1.1.1f - Mozilla SSL Configuration Generator</a></li><li><a href="https://ssl-config.mozilla.org/#server=nginx&amp;version=1.18.0&amp;config=intermediate&amp;openssl=1.1.1f&amp;ocsp=false&amp;guideline=5.6" rel="external nofollow noreferrer">nginx 1.18.0, intermediate config, OpenSSL 1.1.1f - Mozilla SSL Configuration Generator</a></li></ol>]]></content>
-        <author>
-            <name>宝硕</name>
-            <uri>https://baoshuo.ren</uri>
-        </author>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[NOIP 2020 游记]]></title>
-        <id>/post/noip-2020/</id>
-        <link href="/post/noip-2020/"/>
-        <updated>2020-12-05T09:30:03.000Z</updated>
-        <summary type="html"><![CDATA[我属实没想到初中生也能参加 NOIP ，只不过不给评奖罢了。]]></summary>
-        <content type="html"><![CDATA[<p>我属实没想到初中生也能参加 NOIP ，只不过不给评奖罢了。</p><span id="more"></span><p>推荐阅读：<a href="https://oi.baoshuo.ren/solution-noip-2020/" rel="external nofollow noreferrer">NOIP 2020 题解 @ oi.baoshuo.ren</a></p><h2 id="day-1">Day -1</h2><p>强迫自己学了一天竞赛，并且和周围的人讨论了讨论 NOIP 会考点啥。</p><p>晚上看见机房里的学长们全员 typeracer ，属实被震撼到了。</p><h2 id="day-0">Day 0</h2><p>上午有 rp++ 模拟赛，结果一下子掉了 100 多分 <s>，出题人我真谢谢你</s> 。</p><p><img src="https://s1.baoshuo.ren/2021/10/05/qLdM3Fu6yO1Wirm.png" alt="" loading="lazy"></p><p>在线膜拜两位 AK 神仙。</p><p><img src="https://s1.baoshuo.ren/2021/10/05/6kJTM9VxEq2Ryzn.png" alt="" loading="lazy"></p><p>这是为数不多的几次我比 youwike 考得好的模拟赛。</p><p>然后就该收拾东西准备走了。</p><p>下午坐火车去秦皇岛，在车上教练把手机收走了 <s>，过了一会发现没缓存离线题面又把手机要了回来</s> 。</p><p>到了宾馆发现环境还不错，虽然 AzusaCat 和 AlanSP 的屋子正对着工地，但是比别人的都要大。</p><img src="https://s1.baoshuo.ren/2020/12/05/fRagTOlMvx3Gn6B.jpg" width="300" alt="选手胸牌"><p>▲ 选手胸牌</p><p>开会的时候教练们讲了讲注意事项，顺便替我们把选手胸牌领了回来。</p><p>晚上吃完饭，写了两个板子，颓废到 12 点才睡，羡慕 AlanSP 的健康作息。</p><img src="https://s1.baoshuo.ren/2020/12/13/5ePKrZ7Oy8Lj6fc.jpg" width="250" alt="youwike 在考前立的 flag"><p>▲ youwike 在考前立的 flag</p><p>可惜 youwike 最后还是没上二百。</p><h2 id="day-1-2">Day 1</h2><p><img src="https://s1.baoshuo.ren/2020/12/05/NQ4JYSWf5cXt3U6.jpg" alt="" loading="lazy"></p><p>比赛前照了一张合影。</p><p>打开题目发现 T1 可做，写了写调了调，过了样例。拿大样例测了下发现没开 long long ，开了就过了。</p><p>然后就去看其他题，并没有什么思路，于是水了水能水的暴力，骗了骗能骗的分。</p><p>出了考场以后就赶忙收拾东西去火车站。</p><p>在火车上出来了 OI 题库的民间数据，我测了下发现 T1 过了，当时非常兴奋，出分了以后才知道自己被卡了的事实。</p><p>然后就该退役去学文化课了嘛。</p><p>（完）</p>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
