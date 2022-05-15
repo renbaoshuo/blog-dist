@@ -2,13 +2,342 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://blog.baoshuo.ren</id>
     <title>宝硕博客</title>
-    <updated>2022-05-15T08:35:06.266Z</updated>
+    <updated>2022-05-15T10:23:21.078Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <author>
         <name>宝硕</name>
         <uri>https://baoshuo.ren</uri>
     </author>
     <link rel="alternate" href="https://blog.baoshuo.ren"/>
+    <entry>
+        <title type="html"><![CDATA[使用 GitHub Actions 自动申请与部署 SSL 证书]]></title>
+        <id>/post/actions-ssl-cert/</id>
+        <link href="/post/actions-ssl-cert/"/>
+        <updated>2022-05-15T08:47:00.000Z</updated>
+        <summary type="html"><![CDATA[对于一个有很多服务器的人来说，在不同服务器上同步 SSL 证书是一件麻烦事。笔者尝试过很多种方式，最后在 Menci 的推荐下选定了使用 GitHub Actions 来自动申请、续期 SSL 证书，并自动推送到各个服务器上。]]></summary>
+        <content type="html"><![CDATA[<img src="https://s1.baoshuo.ren/2022/05/13/lj2cs5QNP3rWkeq.png" width="100%" alt="使用 GitHub Actions 自动申请与部署 SSL 证书" /><p>对于一个有很多服务器的人来说，在不同服务器上同步 SSL 证书是一件麻烦事。笔者尝试过很多种方式，最后在 <a href="https://men.ci" rel="external nofollow noreferrer">Menci</a> 的推荐下选定了使用 GitHub Actions 来自动申请、续期 SSL 证书，并自动推送到各个服务器上。</p><span id="more"></span><p>本博客的证书也是使用这种方式进行签发、部署的，可以点击浏览器地址栏上的按钮查看证书。</p><h2 id="申请证书">申请证书</h2><h3 id="前期准备">前期准备</h3><p>首先请在本地（或自己的服务器上）成功使用 <a href="https://acme.sh" rel="external nofollow noreferrer">acme.sh</a> 的 <a href="https://letsencrypt.org/docs/challenge-types/#dns-01-challenge" rel="external nofollow noreferrer">DNS-01</a> 验证方式成功申请一次证书，如果不会操作的话可以参考 <a href="https://u.sb/acme-sh-ssl/?utm_source=blog.baoshuo.ren&amp;utm_medium=actions-ssl-cert+tutorial" rel="external nofollow noreferrer">烧饼博客的教程</a> 来进行。这个过程包括：</p><ol><li>向 CA 注册 ACME 账户（如果使用 Let’s Encrypt 则会自动进行，详细步骤请参阅 <a href="https://github.com/acmesh-official/acme.sh/wiki/ZeroSSL.com-CA" rel="external nofollow noreferrer">acme.sh 的 Wiki</a>）。</li><li>通过环境变量指定 DNS 提供商的凭据，用于添加/删除 ACME DNS-01 认证所需的 TXT 记录。</li><li>确认证书申请可以成功，为后续调试排除可能的问题。</li></ol><p>第一次申请证书后，CA 的 ACME 账户凭据将被存储到 <code>~/.acme.sh/ca</code> 中，DNS 提供商的凭据将被存储到 <code>~/.acme.sh/account.conf</code> 中。将它们打包并使用 Base64 编码存储，以备在 GitHub Actions 中使用：</p><pre><code class="hljs sh"><span class="hljs-built_in">cd</span> ~/.acme.sh
+tar cz ca account.conf | <span class="hljs-built_in">base64</span> -w0</code></pre><p>将输出内容添加到 GitHub 仓库的 Secrets 中。注意不要复制输出中的多余信息。</p><h3 id="自动化">自动化</h3><p>如果没有特殊需求，可以使用 <a href="https://github.com/Menci/acme" rel="external nofollow noreferrer">Menci/acme</a> 来简单地申请证书：</p><pre><code class="hljs yaml"><span class="hljs-comment"># 全局环境变量</span>
+<span class="hljs-attr">env:</span>
+  <span class="hljs-comment"># Checkout 到的目录</span>
+  <span class="hljs-attr">CERTS_OUTPUT_BASE:</span> <span class="hljs-string">certs</span>
+  <span class="hljs-comment"># 证书输出目录</span>
+  <span class="hljs-attr">CERTS_OUTPUT_DIRECTORY:</span> <span class="hljs-string">example.com</span>
+  <span class="hljs-comment"># 证书文件名</span>
+  <span class="hljs-attr">FILE_FULLCHAIN:</span> <span class="hljs-string">fullchain.pem</span>
+  <span class="hljs-comment"># 私钥文件名</span>
+  <span class="hljs-attr">FILE_KEY:</span> <span class="hljs-string">privatekey.key</span>
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">issue-ssl-certificate:</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">Issue</span> <span class="hljs-string">SSL</span> <span class="hljs-string">certificate</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">Menci/acme@v1</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-comment"># 指定 acme.sh 的版本</span>
+          <span class="hljs-attr">version:</span> <span class="hljs-number">3.0</span><span class="hljs-number">.2</span>
+
+          <span class="hljs-comment"># 上方保存的以 Base64 编码存储的凭据</span>
+          <span class="hljs-attr">account-tar:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.ACME_SH_ACCOUNT_TAR</span> <span class="hljs-string">&#125;&#125;</span>
+
+          <span class="hljs-comment"># 域名列表，以空格分隔</span>
+          <span class="hljs-attr">domains:</span> <span class="hljs-string">example.com</span> <span class="hljs-string">example.net</span> <span class="hljs-string">example.org</span> <span class="hljs-string">example.edu</span>
+          <span class="hljs-comment"># 是否申请通配符</span>
+          <span class="hljs-attr">append-wildcard:</span> <span class="hljs-literal">true</span>
+
+          <span class="hljs-comment"># 传递给 acme.sh 的额外参数</span>
+          <span class="hljs-attr">arguments:</span> <span class="hljs-string">--dns</span> <span class="hljs-string">dns_cf</span> <span class="hljs-string">--challenge-alias</span> <span class="hljs-string">example.com</span>
+
+          <span class="hljs-comment"># 导出的证书路径</span>
+          <span class="hljs-attr">output-fullchain:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_BASE</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.FILE_FULLCHAIN</span> <span class="hljs-string">&#125;&#125;</span>
+          <span class="hljs-attr">output-key:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_BASE</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.FILE_KEY</span> <span class="hljs-string">&#125;&#125;</span></code></pre><p>如果需要高度自定义 <a href="http://acme.sh" rel="external nofollow noreferrer">acme.sh</a> 的参数，比如为不同的域名设置不同的 DNS 提供商，可以使用下面的方式手动编写命令来执行：</p><pre><code class="hljs yaml"><span class="hljs-comment"># 全局环境变量</span>
+<span class="hljs-attr">env:</span>
+  <span class="hljs-comment"># Checkout 到的目录</span>
+  <span class="hljs-attr">CERTS_OUTPUT_BASE:</span> <span class="hljs-string">certs</span>
+  <span class="hljs-comment"># 证书输出目录</span>
+  <span class="hljs-attr">CERTS_OUTPUT_DIRECTORY:</span> <span class="hljs-string">example.com</span>
+  <span class="hljs-comment"># 证书文件名</span>
+  <span class="hljs-attr">FILE_FULLCHAIN:</span> <span class="hljs-string">fullchain.pem</span>
+  <span class="hljs-comment"># 私钥文件名</span>
+  <span class="hljs-attr">FILE_KEY:</span> <span class="hljs-string">privatekey.key</span>
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">issue-ssl-certificate:</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">Issue</span> <span class="hljs-string">SSL</span> <span class="hljs-string">certificate</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">ref:</span> <span class="hljs-string">master</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span> <span class="hljs-string">output</span> <span class="hljs-string">branch</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">ref:</span> <span class="hljs-string">certs</span>
+          <span class="hljs-attr">path:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_BASE</span> <span class="hljs-string">&#125;&#125;</span>
+
+      <span class="hljs-comment"># 安装 acme.sh</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Install</span> <span class="hljs-string">acme.sh</span>
+        <span class="hljs-attr">shell:</span> <span class="hljs-string">bash</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">curl</span> <span class="hljs-string">-s</span> <span class="hljs-string">https://get.acme.sh</span> <span class="hljs-string">|</span> <span class="hljs-string">sh</span>
+
+      <span class="hljs-comment"># 解压 acme.sh 配置信息</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Extract</span> <span class="hljs-string">account</span> <span class="hljs-string">files</span> <span class="hljs-string">for</span> <span class="hljs-string">acme.sh</span>
+        <span class="hljs-attr">shell:</span> <span class="hljs-string">bash</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|</span>
+<span class="hljs-string">          echo &quot;$ACME_SH_ACCOUNT_TAR&quot; | base64 -d | tar -C ~/.acme.sh -xz</span>
+<span class="hljs-string"></span>        <span class="hljs-attr">env:</span>
+          <span class="hljs-comment"># Base64 编码的 acme.sh 配置信息</span>
+          <span class="hljs-attr">ACME_SH_ACCOUNT_TAR:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.ACME_SH_ACCOUNT_TAR</span> <span class="hljs-string">&#125;&#125;</span>
+
+      <span class="hljs-comment"># 申请证书</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Issue</span> <span class="hljs-string">SSL</span> <span class="hljs-string">certificates</span>
+        <span class="hljs-attr">shell:</span> <span class="hljs-string">bash</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|</span>
+<span class="hljs-string">          ~/.acme.sh/acme.sh --issue        \</span>
+<span class="hljs-string">            -d &quot;example.com&quot;   --dns dns_cf \</span>
+<span class="hljs-string">            -d &quot;*.example.com&quot; --dns dns_cf \</span>
+<span class="hljs-string">            -d &quot;example.net&quot;   --dns dns_dp \</span>
+<span class="hljs-string">            -d &quot;*.example.net&quot; --dns dns_dp \</span>
+<span class="hljs-string">            --server letsencrypt</span>
+<span class="hljs-string"></span>
+      <span class="hljs-comment"># 导出证书</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Copy</span> <span class="hljs-string">certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">output</span> <span class="hljs-string">paths</span>
+        <span class="hljs-attr">shell:</span> <span class="hljs-string">bash</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|</span>
+<span class="hljs-string">          ACME_SH_TEMP_DIR=&quot;$(mktemp -d)&quot;</span>
+<span class="hljs-string">          ACME_SH_TEMP_FILE_FULLCHAIN=&quot;$ACME_SH_TEMP_DIR/fullchain.pem&quot;</span>
+<span class="hljs-string">          ACME_SH_TEMP_FILE_KEY=&quot;$ACME_SH_TEMP_DIR/key.pem&quot;</span>
+<span class="hljs-string"></span>
+          <span class="hljs-string">~/.acme.sh/acme.sh</span> <span class="hljs-string">--install-cert</span> <span class="hljs-string">-d</span> <span class="hljs-string">&quot;$ACME_SH_FIRST_DOMAIN&quot;</span> <span class="hljs-string">--fullchain-file</span> <span class="hljs-string">&quot;$ACME_SH_TEMP_FILE_FULLCHAIN&quot;</span> <span class="hljs-string">--key-file</span> <span class="hljs-string">&quot;$ACME_SH_TEMP_FILE_KEY&quot;</span>
+
+          [[ <span class="hljs-string">-z</span> <span class="hljs-string">&quot;$ACME_SH_OUTPUT_FULLCHAIN&quot;</span> ]] <span class="hljs-string">||</span> <span class="hljs-string">(mkdir</span> <span class="hljs-string">-p</span> <span class="hljs-string">&quot;$(dirname &quot;</span><span class="hljs-string">$ACME_SH_OUTPUT_FULLCHAIN&quot;)&quot;</span> <span class="hljs-string">&amp;&amp;</span> <span class="hljs-string">cp</span> <span class="hljs-string">&quot;$ACME_SH_TEMP_FILE_FULLCHAIN&quot;</span> <span class="hljs-string">&quot;$ACME_SH_OUTPUT_FULLCHAIN&quot;</span><span class="hljs-string">)</span>
+          [[ <span class="hljs-string">-z</span> <span class="hljs-string">&quot;$ACME_SH_OUTPUT_KEY&quot;</span> ]] <span class="hljs-string">||</span> <span class="hljs-string">(mkdir</span> <span class="hljs-string">-p</span> <span class="hljs-string">&quot;$(dirname &quot;</span><span class="hljs-string">$ACME_SH_OUTPUT_KEY&quot;)&quot;</span> <span class="hljs-string">&amp;&amp;</span> <span class="hljs-string">cp</span> <span class="hljs-string">&quot;$ACME_SH_TEMP_FILE_KEY&quot;</span> <span class="hljs-string">&quot;$ACME_SH_OUTPUT_KEY&quot;</span><span class="hljs-string">)</span>
+
+          <span class="hljs-string">rm</span> <span class="hljs-string">-rf</span> <span class="hljs-string">&quot;$ACME_SH_TEMP_DIR&quot;</span>
+        <span class="hljs-attr">env:</span>
+          <span class="hljs-comment"># 修改此处的 example.com 为申请时填写的第一个域名</span>
+          <span class="hljs-attr">ACME_SH_FIRST_DOMAIN:</span> <span class="hljs-string">example.com</span>
+          <span class="hljs-attr">ACME_SH_OUTPUT_FULLCHAIN:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_BASE</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.FILE_FULLCHAIN</span> <span class="hljs-string">&#125;&#125;</span>
+          <span class="hljs-attr">ACME_SH_OUTPUT_KEY:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_BASE</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.FILE_KEY</span> <span class="hljs-string">&#125;&#125;</span></code></pre><h3 id="上传证书至仓库">上传证书至仓库</h3><pre><code class="hljs yaml"><span class="hljs-comment"># 上传证书</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Push</span> <span class="hljs-string">to</span> <span class="hljs-string">GitHub</span>
+  <span class="hljs-attr">run:</span> <span class="hljs-string">|</span>
+<span class="hljs-string">    git config --global user.name &quot;BaoshuoBot&quot;</span>
+<span class="hljs-string">    git config --global user.email &quot;79077260+BaoshuoBot@users.noreply.github.com&quot;</span>
+<span class="hljs-string"></span>
+    <span class="hljs-string">cd</span> <span class="hljs-string">&quot;$CERTS_DIRECTORY&quot;</span>
+
+    <span class="hljs-string">git</span> <span class="hljs-string">add</span> <span class="hljs-string">&quot;$FILE_FULLCHAIN&quot;</span> <span class="hljs-string">&quot;$FILE_KEY&quot;</span>
+    <span class="hljs-string">git</span> <span class="hljs-string">commit</span> <span class="hljs-string">-m</span> <span class="hljs-string">&quot;Upload certificates on $(date &#x27;+%Y-%m-%d %H:%M:%S&#x27;)&quot;</span>
+    <span class="hljs-string">git</span> <span class="hljs-string">push</span>
+  <span class="hljs-attr">env:</span>
+    <span class="hljs-attr">TZ:</span> <span class="hljs-string">Asia/Shanghai</span>
+    <span class="hljs-attr">CERTS_DIRECTORY:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_BASE</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;</span></code></pre><h2 id="部署证书">部署证书</h2><p>在申请证书的 Job 执行完成后，可以执行一系列其他的 Job 来将证书部署到各个服务器或云服务。</p><h3 id="服务器">服务器</h3><p>可以使用 <a href="https://github.com/easingthemes/ssh-deploy" rel="external nofollow noreferrer"><code>easingthemes/ssh-deploy</code></a> 来使用 rsync 将证书同步到服务器上。同步完成后再使用 <a href="https://github.com/appleboy/ssh-action" rel="external nofollow noreferrer"><code>appleboy/ssh-action</code></a> 远程执行命令重载 Nginx / Apache。</p><pre><code class="hljs yaml"><span class="hljs-comment"># 部署到服务器</span>
+<span class="hljs-attr">deploy-to-server:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">Certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">Server</span>
+  <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+  <span class="hljs-attr">needs:</span> <span class="hljs-string">issue-ssl-certificate</span>
+
+  <span class="hljs-attr">strategy:</span>
+    <span class="hljs-attr">matrix:</span>
+      <span class="hljs-attr">host:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-number">174.136</span><span class="hljs-number">.239</span><span class="hljs-number">.1</span> <span class="hljs-comment"># Server 1</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-number">174.136</span><span class="hljs-number">.239</span><span class="hljs-number">.2</span> <span class="hljs-comment"># Server 2</span>
+        <span class="hljs-comment"># ...</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-number">174.136</span><span class="hljs-number">.239</span><span class="hljs-number">.254</span> <span class="hljs-comment"># Server N</span>
+
+  <span class="hljs-attr">steps:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span>
+      <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
+      <span class="hljs-attr">with:</span>
+        <span class="hljs-attr">ref:</span> <span class="hljs-string">certs</span>
+
+    <span class="hljs-comment"># 上传证书</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Upload</span> <span class="hljs-string">certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">server</span>
+      <span class="hljs-attr">uses:</span> <span class="hljs-string">easingthemes/ssh-deploy@v2.1.5</span>
+      <span class="hljs-attr">env:</span>
+        <span class="hljs-attr">SSH_PRIVATE_KEY:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.SSH_PRIVATE_KEY</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-attr">ARGS:</span> <span class="hljs-string">&#x27;-avz --delete&#x27;</span>
+        <span class="hljs-attr">REMOTE_HOST:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">matrix.host</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-attr">REMOTE_USER:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.REMOTE_USER</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-attr">SOURCE:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/</span>
+        <span class="hljs-attr">TARGET:</span> <span class="hljs-string">/path/to/ssl/certs/$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/</span>
+
+    <span class="hljs-comment"># 重载 Nginx</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Force-reload</span> <span class="hljs-string">nginx</span>
+      <span class="hljs-attr">uses:</span> <span class="hljs-string">appleboy/ssh-action@v0.1.4</span>
+      <span class="hljs-attr">with:</span>
+        <span class="hljs-attr">host:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">matrix.host</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-attr">username:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.REMOTE_USER</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-attr">key:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.SSH_PRIVATE_KEY</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-attr">script:</span> <span class="hljs-string">|</span>
+          <span class="hljs-string">sudo</span> <span class="hljs-string">/opt/hooks/reload-nginx.sh</span></code></pre><p>需要注意的是，重载 Nginx / Apache 的命令需要 root 权限才能执行，可以采用只允许部署用户以 root 权限执行重载脚本的方式来避免出现安全问题。</p><p>在 <code>/opt/hooks</code> 目录下新建一个文件 <code>reload-nginx.sh</code>，内容如下：</p><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span>
+sudo systemctl force-reload nginx</code></pre><p>然后新建一个名为 <code>actions-cert</code> 的用户，然后在 <code>/etc/sudoers</code> 文件中添加以下内容：</p><pre><code class="hljs arcade">actions-cert <span class="hljs-built_in">ALL</span>=(<span class="hljs-built_in">ALL</span>) NOPASSWD: <span class="hljs-regexp">/opt/</span>hooks/reload-nginx.sh</code></pre><p>这个配置可以使 <code>actions-cert</code> 用户免密码以 root 用户的权限执行 <code>/opt/hooks/reload-nginx.sh</code>。</p><p>最后使用 <code>chmod 755 /opt/hooks/reload-nginx.sh</code> 命令将 <code>reload-nginx.sh</code> 文件设置为可执行，同时禁止非所有者对其进行写入操作。</p><p>如果服务器位于 NAT 后，或者禁止了 SSH 连接，还有两个方法可以将证书部署到内网服务器上：</p><ol><li>将证书先部署到有部署条件的服务器上，然后再在内网服务器上使用 rsync 从部署好的服务器上拉取证书。</li><li>将证书上传到 <a href="https://azure.microsoft.com/en-us/services/key-vault/" rel="external nofollow noreferrer">Azure Key Vault</a> 等托管服务中，再在服务器上按照 <a href="https://blog.men.ci/ssl-with-github-actions/#%E6%9C%8D%E5%8A%A1%E5%99%A8" rel="external nofollow noreferrer">Menci 的文章</a> 中的教程拉取即可。</li></ol><h3 id="阿里云">阿里云</h3><p>阿里云的 <a href="https://www.aliyun.com/product/cas" rel="external nofollow noreferrer">SSL 证书服务</a> 支持上传自定义证书，该证书可以用于 <a href="https://www.aliyun.com/product/cdn" rel="external nofollow noreferrer">阿里云 CDN</a>。阿里云暂未提供将证书部署至 OSS 的 API，建议 OSS 用户使用 CDN 回源 OSS 来代替。</p><p>使用 <a href="https://github.com/Menci/deploy-certificate-to-aliyun" rel="external nofollow noreferrer">Menci/deploy-certificate-to-aliyun</a> 将证书部署到阿里云：</p><pre><code class="hljs yaml"><span class="hljs-comment"># 部署到阿里云</span>
+<span class="hljs-attr">deploy-to-server:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">Certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">Aliyun</span>
+  <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+  <span class="hljs-attr">needs:</span> <span class="hljs-string">issue-ssl-certificate</span>
+
+  <span class="hljs-attr">steps:</span>
+    <span class="hljs-comment"># 拉取证书存储分支</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span>
+      <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
+      <span class="hljs-attr">with:</span>
+        <span class="hljs-attr">ref:</span> <span class="hljs-string">certs</span>
+
+    <span class="hljs-comment"># 上传证书</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">aliyun</span>
+      <span class="hljs-attr">uses:</span> <span class="hljs-string">Menci/deploy-certificate-to-aliyun@beta-v1</span>
+      <span class="hljs-attr">with:</span>
+        <span class="hljs-attr">access-key-id:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.ALIYUN_ACCESS_KEY_ID</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-attr">access-key-secret:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.ALIYUN_ACCESS_KEY_SECRET</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-attr">fullchain-file:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.FILE_FULLCHAIN</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-attr">key-file:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.FILE_KEY</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-attr">certificate-name:</span> <span class="hljs-string">example.com</span>
+        <span class="hljs-attr">cdn-domains:</span> <span class="hljs-string">|</span>
+<span class="hljs-string">          example.com</span>
+<span class="hljs-string">          example.net</span></code></pre><p>其中 <code>certificate-name</code> 指定上传的证书在证书服务中的名称（将自动替换旧版本），<code>cdn-domain</code> 指定需要将该证书部署到的 CDN 域名列表（用空白字符隔开）。</p><p>建议使用子账户 Access Key，为其赋予以下权限（并按需使用资源组隔离）：</p><ul><li>AliyunYundunCertFullAccess</li><li>AliyunCDNFullAccess</li><li>AliyunPCDNFullAccess</li><li>AliyunSCDNFullAccess</li><li>AliyunDCDNFullAccess</li></ul><h2 id="完整例子">完整例子</h2><p>这个 Action 完成了以下操作：</p><ol><li>申请证书，并上传到仓库的 <code>certs</code> 分支。</li><li>在申请证书后将 <code>certs</code> 分支中的证书部署到服务器上。</li></ol><pre><code class="hljs yaml"><span class="hljs-comment"># 名称</span>
+<span class="hljs-attr">name:</span> <span class="hljs-string">Issue</span> <span class="hljs-string">SSL</span> <span class="hljs-string">Certificates</span>
+
+<span class="hljs-comment"># 触发条件</span>
+<span class="hljs-attr">on:</span>
+  <span class="hljs-comment"># 手动运行</span>
+  <span class="hljs-attr">workflow_dispatch:</span>
+  <span class="hljs-comment"># 定时运行</span>
+  <span class="hljs-attr">schedule:</span>
+    <span class="hljs-comment"># 每两个月运行一次</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">cron:</span> <span class="hljs-string">&#x27;0 0 1 */2 *&#x27;</span>
+
+<span class="hljs-comment"># 全局环境变量</span>
+<span class="hljs-attr">env:</span>
+  <span class="hljs-comment"># Checkout 到的目录</span>
+  <span class="hljs-attr">CERTS_OUTPUT_BASE:</span> <span class="hljs-string">certs</span>
+  <span class="hljs-comment"># 证书输出目录</span>
+  <span class="hljs-attr">CERTS_OUTPUT_DIRECTORY:</span> <span class="hljs-string">example.com</span>
+  <span class="hljs-comment"># 证书文件名</span>
+  <span class="hljs-attr">FILE_FULLCHAIN:</span> <span class="hljs-string">fullchain.pem</span>
+  <span class="hljs-comment"># 私钥文件名</span>
+  <span class="hljs-attr">FILE_KEY:</span> <span class="hljs-string">privatekey.key</span>
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">issue-ssl-certificate:</span>
+    <span class="hljs-comment"># 申请证书并 push 到 certs 分支</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">Issue</span> <span class="hljs-string">SSL</span> <span class="hljs-string">certificate</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">ref:</span> <span class="hljs-string">master</span>
+
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span> <span class="hljs-string">output</span> <span class="hljs-string">branch</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">ref:</span> <span class="hljs-string">certs</span>
+          <span class="hljs-attr">path:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_BASE</span> <span class="hljs-string">&#125;&#125;</span>
+
+      <span class="hljs-comment"># 安装 acme.sh</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Install</span> <span class="hljs-string">acme.sh</span>
+        <span class="hljs-attr">shell:</span> <span class="hljs-string">bash</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">curl</span> <span class="hljs-string">-s</span> <span class="hljs-string">https://get.acme.sh</span> <span class="hljs-string">|</span> <span class="hljs-string">sh</span>
+
+      <span class="hljs-comment"># 解压 acme.sh 配置信息</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Extract</span> <span class="hljs-string">account</span> <span class="hljs-string">files</span> <span class="hljs-string">for</span> <span class="hljs-string">acme.sh</span>
+        <span class="hljs-attr">shell:</span> <span class="hljs-string">bash</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|</span>
+<span class="hljs-string">          echo &quot;$ACME_SH_ACCOUNT_TAR&quot; | base64 -d | tar -C ~/.acme.sh -xz</span>
+<span class="hljs-string"></span>        <span class="hljs-attr">env:</span>
+          <span class="hljs-comment"># Base64 编码的 acme.sh 配置信息</span>
+          <span class="hljs-attr">ACME_SH_ACCOUNT_TAR:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.ACME_SH_ACCOUNT_TAR</span> <span class="hljs-string">&#125;&#125;</span>
+
+      <span class="hljs-comment"># 申请证书</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Issue</span> <span class="hljs-string">SSL</span> <span class="hljs-string">certificates</span>
+        <span class="hljs-attr">shell:</span> <span class="hljs-string">bash</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|</span>
+<span class="hljs-string">          ~/.acme.sh/acme.sh --issue            \</span>
+<span class="hljs-string">            -d &quot;example.com&quot; -d &quot;*.example.com&quot; \</span>
+<span class="hljs-string">            --dns dns_cf --server letsencrypt</span>
+<span class="hljs-string"></span>
+      <span class="hljs-comment"># 导出证书</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Copy</span> <span class="hljs-string">certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">output</span> <span class="hljs-string">paths</span>
+        <span class="hljs-attr">shell:</span> <span class="hljs-string">bash</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|</span>
+<span class="hljs-string">          ACME_SH_TEMP_DIR=&quot;$(mktemp -d)&quot;</span>
+<span class="hljs-string">          ACME_SH_TEMP_FILE_FULLCHAIN=&quot;$ACME_SH_TEMP_DIR/fullchain.pem&quot;</span>
+<span class="hljs-string">          ACME_SH_TEMP_FILE_KEY=&quot;$ACME_SH_TEMP_DIR/key.pem&quot;</span>
+<span class="hljs-string"></span>
+          <span class="hljs-comment"># 不要忘记修改这里的 -d 参数值为上方的第一个域名</span>
+          <span class="hljs-string">~/.acme.sh/acme.sh</span> <span class="hljs-string">--install-cert</span> <span class="hljs-string">-d</span> <span class="hljs-string">&quot;example.com&quot;</span> <span class="hljs-string">--fullchain-file</span> <span class="hljs-string">&quot;$ACME_SH_TEMP_FILE_FULLCHAIN&quot;</span> <span class="hljs-string">--key-file</span> <span class="hljs-string">&quot;$ACME_SH_TEMP_FILE_KEY&quot;</span>
+
+          [[ <span class="hljs-string">-z</span> <span class="hljs-string">&quot;$ACME_SH_OUTPUT_FULLCHAIN&quot;</span> ]] <span class="hljs-string">||</span> <span class="hljs-string">(mkdir</span> <span class="hljs-string">-p</span> <span class="hljs-string">&quot;$(dirname &quot;</span><span class="hljs-string">$ACME_SH_OUTPUT_FULLCHAIN&quot;)&quot;</span> <span class="hljs-string">&amp;&amp;</span> <span class="hljs-string">cp</span> <span class="hljs-string">&quot;$ACME_SH_TEMP_FILE_FULLCHAIN&quot;</span> <span class="hljs-string">&quot;$ACME_SH_OUTPUT_FULLCHAIN&quot;</span><span class="hljs-string">)</span>
+          [[ <span class="hljs-string">-z</span> <span class="hljs-string">&quot;$ACME_SH_OUTPUT_KEY&quot;</span> ]] <span class="hljs-string">||</span> <span class="hljs-string">(mkdir</span> <span class="hljs-string">-p</span> <span class="hljs-string">&quot;$(dirname &quot;</span><span class="hljs-string">$ACME_SH_OUTPUT_KEY&quot;)&quot;</span> <span class="hljs-string">&amp;&amp;</span> <span class="hljs-string">cp</span> <span class="hljs-string">&quot;$ACME_SH_TEMP_FILE_KEY&quot;</span> <span class="hljs-string">&quot;$ACME_SH_OUTPUT_KEY&quot;</span><span class="hljs-string">)</span>
+
+          <span class="hljs-string">rm</span> <span class="hljs-string">-rf</span> <span class="hljs-string">&quot;$ACME_SH_TEMP_DIR&quot;</span>
+        <span class="hljs-attr">env:</span>
+          <span class="hljs-attr">ACME_SH_OUTPUT_FULLCHAIN:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_BASE</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.FILE_FULLCHAIN</span> <span class="hljs-string">&#125;&#125;</span>
+          <span class="hljs-attr">ACME_SH_OUTPUT_KEY:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_BASE</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.FILE_KEY</span> <span class="hljs-string">&#125;&#125;</span>
+
+      <span class="hljs-comment"># 上传证书</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Push</span> <span class="hljs-string">to</span> <span class="hljs-string">GitHub</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|</span>
+<span class="hljs-string">          git config --global user.name &quot;BaoshuoBot&quot;</span>
+<span class="hljs-string">          git config --global user.email &quot;79077260+BaoshuoBot@users.noreply.github.com&quot;</span>
+<span class="hljs-string"></span>
+          <span class="hljs-string">cd</span> <span class="hljs-string">&quot;$CERTS_DIRECTORY&quot;</span>
+
+          <span class="hljs-string">git</span> <span class="hljs-string">add</span> <span class="hljs-string">&quot;$FILE_FULLCHAIN&quot;</span> <span class="hljs-string">&quot;$FILE_KEY&quot;</span>
+          <span class="hljs-string">git</span> <span class="hljs-string">commit</span> <span class="hljs-string">-m</span> <span class="hljs-string">&quot;Upload certificates on $(date &#x27;+%Y-%m-%d %H:%M:%S&#x27;)&quot;</span>
+          <span class="hljs-string">git</span> <span class="hljs-string">push</span>
+        <span class="hljs-attr">env:</span>
+          <span class="hljs-attr">TZ:</span> <span class="hljs-string">Asia/Shanghai</span>
+          <span class="hljs-attr">CERTS_DIRECTORY:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_BASE</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;</span>
+
+  <span class="hljs-comment"># 部署证书到服务器</span>
+  <span class="hljs-attr">deploy-to-server:</span>
+    <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">Certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">Server</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+    <span class="hljs-attr">needs:</span> <span class="hljs-string">issue-ssl-certificate</span>
+
+    <span class="hljs-attr">strategy:</span>
+      <span class="hljs-attr">matrix:</span>
+        <span class="hljs-attr">host:</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-number">174.136</span><span class="hljs-number">.239</span><span class="hljs-number">.1</span> <span class="hljs-comment"># Server 1</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-number">174.136</span><span class="hljs-number">.239</span><span class="hljs-number">.2</span> <span class="hljs-comment"># Server 2</span>
+          <span class="hljs-comment"># ...</span>
+          <span class="hljs-bullet">-</span> <span class="hljs-number">174.136</span><span class="hljs-number">.239</span><span class="hljs-number">.254</span> <span class="hljs-comment"># Server N</span>
+
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">ref:</span> <span class="hljs-string">certs</span>
+
+      <span class="hljs-comment"># 上传证书</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Upload</span> <span class="hljs-string">certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">server</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">easingthemes/ssh-deploy@v2.1.5</span>
+        <span class="hljs-attr">env:</span>
+          <span class="hljs-attr">SSH_PRIVATE_KEY:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.SSH_PRIVATE_KEY</span> <span class="hljs-string">&#125;&#125;</span>
+          <span class="hljs-attr">ARGS:</span> <span class="hljs-string">&#x27;-avz --delete&#x27;</span>
+          <span class="hljs-attr">REMOTE_HOST:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">matrix.host</span> <span class="hljs-string">&#125;&#125;</span>
+          <span class="hljs-attr">REMOTE_USER:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.REMOTE_USER</span> <span class="hljs-string">&#125;&#125;</span>
+          <span class="hljs-attr">SOURCE:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/</span>
+          <span class="hljs-attr">TARGET:</span> <span class="hljs-string">/path/to/ssl/certs/$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/</span>
+
+      <span class="hljs-comment"># 重载 Nginx</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Force-reload</span> <span class="hljs-string">nginx</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">appleboy/ssh-action@v0.1.4</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">host:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">matrix.host</span> <span class="hljs-string">&#125;&#125;</span>
+          <span class="hljs-attr">username:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.REMOTE_USER</span> <span class="hljs-string">&#125;&#125;</span>
+          <span class="hljs-attr">key:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.SSH_PRIVATE_KEY</span> <span class="hljs-string">&#125;&#125;</span>
+          <span class="hljs-attr">script:</span> <span class="hljs-string">|</span>
+            <span class="hljs-string">sudo</span> <span class="hljs-string">/opt/hooks/reload-nginx.sh</span></code></pre><h2 id="参考资料">参考资料</h2><ol><li><a href="https://blog.men.ci/ssl-with-github-actions/" rel="external nofollow noreferrer">使用 GitHub Actions 自动申请与部署 ACME SSL 证书</a>，Menci，2022 年 5 月 11 日。对原文章内容的使用已经过作者同意。</li><li><a href="https://u.sb/acme-sh-ssl/" rel="external nofollow noreferrer">使用 acme.sh 配置自动续签 SSL 证书</a>，烧饼博客，2022 年 2 月 3 日。</li></ol><p>文章头图由 <a href="https://men.ci" rel="external nofollow noreferrer">Menci</a> 制作，使用已经过授权，在此表示感谢。</p>]]></content>
+        <author>
+            <name>宝硕</name>
+            <uri>https://baoshuo.ren</uri>
+        </author>
+    </entry>
     <entry>
         <title type="html"><![CDATA[强制卸载三星应用分身中的残留应用]]></title>
         <id>/post/uninstall-samsung-extra-dual-app/</id>
@@ -81,7 +410,7 @@
   <span class="hljs-attr">run:</span> <span class="hljs-string">|</span>
     <span class="hljs-string">git</span> <span class="hljs-string">ls-files</span> <span class="hljs-string">|</span> <span class="hljs-string">while</span> <span class="hljs-string">read</span> <span class="hljs-string">filepath;</span> <span class="hljs-string">do</span> <span class="hljs-string">touch</span> <span class="hljs-string">-d</span> <span class="hljs-string">&quot;$(git log -1 --format=&#x27;@%ct&#x27; $filepath)&quot;</span> <span class="hljs-string">&quot;$filepath&quot;</span> <span class="hljs-string">&amp;&amp;</span> <span class="hljs-string">echo</span> <span class="hljs-string">&quot;Fixed: $filepath&quot;</span><span class="hljs-string">;</span> <span class="hljs-string">done</span></code></pre><p>当然，为了让 git 有日志可寻，还得在检出的时候顺带把所有提交历史一并拉下来，指定 <code>fetch-depth</code> 就能做到：</p><pre><code class="hljs yaml"><span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
   <span class="hljs-attr">with:</span>
-    <span class="hljs-attr">fetch-depth:</span> <span class="hljs-number">0</span></code></pre><p>然后开启 GitHub Pages 功能即可访问到构建好的站点了。</p><h2 id="cloudflare-pages">Cloudflare Pages</h2><p>如果觉得 GitHub Actions + GitHub Pages 比较麻烦的话，才推出不久的 Cloudflare Pages 或许是一个不错的选择。</p><p>前往 <a href="https://dash.cloudflare.com" rel="external nofollow noreferrer">CloudFlare 管理面板</a> 登录账号后即可在右侧找到「网页」或者「Pages」功能的入口。</p><p>点击新建按钮，选择要使用的仓库，点击下一步。</p><p><img src="https://s1.baoshuo.ren/2021/10/31/9HpOja1N6JIK4DP.png" alt="" loading="lazy"></p><p>Cloudflare Pages 的构建配置模板中并没有给出 Hexo 的模板，所以需要自己填写：</p><p><img src="https://s1.baoshuo.ren/2021/10/31/zc7GdhKqCSfliQ1.png" alt="" loading="lazy"></p><p>完成之后点击确定就可以开始构建站点了。</p><p><img src="https://s1.baoshuo.ren/2021/10/31/Z9YrJGNByXhKbkl.png" alt="" loading="lazy"></p><p>构建完成后，访问分配的 <code>pages.dev</code> 子域名即可查看构建好的站点。</p><p>可以在「自定义域」选项卡中添加自定义域名。</p><h2 id="netlify">Netlify</h2><p>Netlify 是一家为静态网站提供托管服务的平台，有一定的免费额度，对于小型站点来说使用免费套餐就足够了。</p><p>首先登陆账号，点击「New site from Git」按钮新建一个站点。</p><p><img src="https://s1.baoshuo.ren/2021/10/31/sULdZkfIgOBhzJP.png" alt="" loading="lazy"></p><p>可以看到 Netlify 自动识别出了博客使用的框架并且填充好了构建命令，接下来只需要点击下一步即可。</p><p><img src="https://s1.baoshuo.ren/2021/10/31/yVlnMEJgeLSzwFD.png" alt="" loading="lazy"></p><p>新建站点完成以后可以在「Domain Settings」页面中修改默认分配的 <code>netlify.app</code> 子域名，并添加自定义域名。</p><h2 id="vercel">Vercel</h2><p>Vercel 是一个类似于 Netlify 的静态网站托管平台（Vercel 也支持托管 Serverless 函数，不过不在本文的讨论范围内）。</p><p><img src="https://s1.baoshuo.ren/2021/10/22/1oLr8fiODTNXSRP.png" alt="" loading="lazy"></p><p>绑定好 GitHub 账号后导入一个新的项目即可。</p><p><img src="https://s1.baoshuo.ren/2021/10/31/EAsH2CWLUTZFeXu.png" alt="" loading="lazy"></p><p>Vercel 也和 Netlify 自动填充好了构建命令，如果没有特殊需求可以直接点击下一步。</p><p>可以在项目的域名设置中绑定自定义域名。</p><h2 id="参考资料">参考资料</h2><ol><li><a href="https://blog.ichr.me/post/automated-deployment-of-serverless-static-blog/" rel="external nofollow noreferrer">初探无后端静态博客自动化部署方案</a>，ChrAlpha，2020 年 2 月 14 日。</li><li><a href="https://stackoverflow.com/questions/42032035/finding-files-older-than-certain-dates-in-git-repository" rel="external nofollow noreferrer">Finding files older than certain dates in Git repository</a>，Scott Weldon (on Stack Overflow)，2017 年 2 月 7 日。</li><li><a href="https://blog.skk.moe/post/deploy-blog-to-cf-workers-site/" rel="external nofollow noreferrer">将 Hexo 部署到 Cloudflare Workers Site 上的趟坑记录</a>，Sukka，2020 年 6 月 7 日。</li></ol>]]></content>
+    <span class="hljs-attr">fetch-depth:</span> <span class="hljs-number">0</span></code></pre><p>然后开启 GitHub Pages 功能即可访问到构建好的站点了。</p><h2 id="cloudflare-pages">Cloudflare Pages</h2><p>如果觉得 GitHub Actions + GitHub Pages 比较麻烦的话，才推出不久的 Cloudflare Pages 或许是一个不错的选择。</p><p>前往 <a href="https://dash.cloudflare.com" rel="external nofollow noreferrer">CloudFlare 管理面板</a> 登录账号后即可在右侧找到「网页」或者「Pages」功能的入口。</p><p>点击新建按钮，选择要使用的仓库，点击下一步。</p><p><img src="https://s1.baoshuo.ren/2021/10/31/9HpOja1N6JIK4DP.png" alt="" loading="lazy"></p><p>Cloudflare Pages 的构建配置模板中并没有给出 Hexo 的模板，所以需要自己填写：</p><p><img src="https://s1.baoshuo.ren/2021/10/31/zc7GdhKqCSfliQ1.png" alt="" loading="lazy"></p><p>完成之后点击确定就可以开始构建站点了。</p><p><img src="https://s1.baoshuo.ren/2021/10/31/Z9YrJGNByXhKbkl.png" alt="" loading="lazy"></p><p>构建完成后，访问分配的 <code>pages.dev</code> 子域名即可查看构建好的站点。</p><p>可以在「自定义域」选项卡中添加自定义域名。</p><h2 id="netlify">Netlify</h2><p>Netlify 是一家为静态网站提供托管服务的平台，有一定的免费额度，对于小型站点来说使用免费套餐就足够了。</p><p>首先登陆账号，点击「New site from Git」按钮新建一个站点。</p><p><img src="https://s1.baoshuo.ren/2021/10/31/sULdZkfIgOBhzJP.png" alt="" loading="lazy"></p><p>可以看到 Netlify 自动识别出了博客使用的框架并且填充好了构建命令，接下来只需要点击下一步即可。</p><p><img src="https://s1.baoshuo.ren/2021/10/31/yVlnMEJgeLSzwFD.png" alt="" loading="lazy"></p><p>新建站点完成以后可以在「Domain Settings」页面中修改默认分配的 <code>netlify.app</code> 子域名，并添加自定义域名。</p><h2 id="vercel">Vercel</h2><p>Vercel 是一个类似于 Netlify 的静态网站托管平台（Vercel 也支持托管 Serverless 函数，不过不在本文的讨论范围内）。</p><p><img src="https://s1.baoshuo.ren/2021/10/22/1oLr8fiODTNXSRP.png" alt="" loading="lazy"></p><p>绑定好 GitHub 账号后导入一个新的项目即可。</p><p><img src="https://s1.baoshuo.ren/2021/10/31/EAsH2CWLUTZFeXu.png" alt="" loading="lazy"></p><p>Vercel 也和 Netlify 自动填充好了构建命令，如果没有特殊需求可以直接点击下一步。</p><p>可以在项目的域名设置中绑定自定义域名。</p><h2 id="参考资料-2">参考资料</h2><ol><li><a href="https://blog.ichr.me/post/automated-deployment-of-serverless-static-blog/" rel="external nofollow noreferrer">初探无后端静态博客自动化部署方案</a>，ChrAlpha，2020 年 2 月 14 日。</li><li><a href="https://stackoverflow.com/questions/42032035/finding-files-older-than-certain-dates-in-git-repository" rel="external nofollow noreferrer">Finding files older than certain dates in Git repository</a>，Scott Weldon (on Stack Overflow)，2017 年 2 月 7 日。</li><li><a href="https://blog.skk.moe/post/deploy-blog-to-cf-workers-site/" rel="external nofollow noreferrer">将 Hexo 部署到 Cloudflare Workers Site 上的趟坑记录</a>，Sukka，2020 年 6 月 7 日。</li></ol>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
@@ -170,7 +499,7 @@ xhr.<span class="hljs-property">withCredentials</span> = <span class="hljs-liter
 xhr.<span class="hljs-property">onreadystatechange</span> = handler; <span class="hljs-comment">// 此处的 Handler 需要自行定义</span>
 xhr.<span class="hljs-title function_">send</span>();</code></pre><p>使用 fetch 进行请求时则需要设置 <code>credentials</code> 为 <code>include</code> 才能使浏览器向跨域源发送包含凭据的请求。</p><pre><code class="hljs javascript"><span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;https://baoshuo.ren&#x27;</span>, &#123;
   <span class="hljs-attr">credentials</span>: <span class="hljs-string">&#x27;include&#x27;</span>,
-&#125;);</code></pre><h2 id="与-jsonp-的比较">与 JSONP 的比较</h2><p>CORS 与 JSONP 的使用目的是相同的，但是 CORS 比 JSONP 更强大。</p><p>JSONP 的缺点是只支持 GET 请求，而 CORS 则支持所有类型的 HTTP 请求。如果网站需要兼容老式浏览器或者需要向不支持 CORS 的网站请求数据仍然需要使用 JSONP 。</p><h2 id="参考资料-2">参考资料</h2><ol><li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS" rel="external nofollow noreferrer">跨源资源共享（CORS）</a>，MDN Web Docs，2021 年 8 月 8 日。</li><li><a href="https://www.ruanyifeng.com/blog/2016/04/cors.html" rel="external nofollow noreferrer">跨域资源共享 CORS 详解</a>，阮一峰的网络日志，2016 年 4 月 12 日。</li><li><a href="https://zh.wikipedia.org/wiki/%E8%B7%A8%E4%BE%86%E6%BA%90%E8%B3%87%E6%BA%90%E5%85%B1%E4%BA%AB" rel="external nofollow noreferrer">跨域资源共享</a>，维基百科，2021 年 5 月 3 日。</li><li>3.2. CORS protocol，<a href="https://fetch.spec.whatwg.org/#http-cors-protocol" rel="external nofollow noreferrer">Fetch Standard</a>，2021 年 9 月 30 日。</li><li>参数，<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/fetch#%E5%8F%82%E6%95%B0" rel="external nofollow noreferrer">WorkerOrGlobalScope.fetch()</a>，MDN Web Docs，2021 年 9 月 1 日。</li></ol>]]></content>
+&#125;);</code></pre><h2 id="与-jsonp-的比较">与 JSONP 的比较</h2><p>CORS 与 JSONP 的使用目的是相同的，但是 CORS 比 JSONP 更强大。</p><p>JSONP 的缺点是只支持 GET 请求，而 CORS 则支持所有类型的 HTTP 请求。如果网站需要兼容老式浏览器或者需要向不支持 CORS 的网站请求数据仍然需要使用 JSONP 。</p><h2 id="参考资料-3">参考资料</h2><ol><li><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS" rel="external nofollow noreferrer">跨源资源共享（CORS）</a>，MDN Web Docs，2021 年 8 月 8 日。</li><li><a href="https://www.ruanyifeng.com/blog/2016/04/cors.html" rel="external nofollow noreferrer">跨域资源共享 CORS 详解</a>，阮一峰的网络日志，2016 年 4 月 12 日。</li><li><a href="https://zh.wikipedia.org/wiki/%E8%B7%A8%E4%BE%86%E6%BA%90%E8%B3%87%E6%BA%90%E5%85%B1%E4%BA%AB" rel="external nofollow noreferrer">跨域资源共享</a>，维基百科，2021 年 5 月 3 日。</li><li>3.2. CORS protocol，<a href="https://fetch.spec.whatwg.org/#http-cors-protocol" rel="external nofollow noreferrer">Fetch Standard</a>，2021 年 9 月 30 日。</li><li>参数，<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/fetch#%E5%8F%82%E6%95%B0" rel="external nofollow noreferrer">WorkerOrGlobalScope.fetch()</a>，MDN Web Docs，2021 年 9 月 1 日。</li></ol>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
@@ -182,7 +511,7 @@ xhr.<span class="hljs-title function_">send</span>();</code></pre><p>使用 fetc
         <link href="/post/noi-linux-2/"/>
         <updated>2021-08-08T13:44:33.000Z</updated>
         <summary type="html"><![CDATA[时隔多年，CCF 终于发布了新版的 NOI Linux ，替换了以前基于 Ubuntu 14.04 的 NOI Linux 1.4.1。]]></summary>
-        <content type="html"><![CDATA[<img src="https://s1.baoshuo.ren/2021/08/15/POMht9fim1vVKcp.png" width="100%" alt="NOI Linux 2.0 上手体验" /><p>时隔多年，CCF 终于发布了新版的 NOI Linux ，替换了以前基于 Ubuntu 14.04 的 NOI Linux 1.4.1。</p><span id="more"></span><p>在 NOI Linux 2.0 发布的当天，我就迫不及待地下载好了镜像（<a href="https://noiresources.ccf.org.cn/ubuntu-noi-v2.0.iso" rel="external nofollow noreferrer"><code>ubuntu-noi-v2.0.iso</code></a>），但由于时间原因，没有第一时间进行体验。</p><h2 id="安装">安装</h2><p>首先先新建好一台虚拟机。</p><p><img src="https://s1.baoshuo.ren/2021/07/25/ceaObqknR3FTtlU.png" alt="" loading="lazy"></p><p>新建虚拟机及挂载镜像的步骤不再过多叙述，在安装时需要断开网络连接。</p><p><img src="https://s1.baoshuo.ren/2021/07/25/PeYV6lquxawzL7b.png" alt="" loading="lazy"></p><p>开屏就是自定义的启动界面。</p><p>安装后需要连接网络，运行 <code>sudo apt update</code> 更新软件包列表，然后安装 <code>open-vm-tools-desktop</code> ，安装完成后建议重启虚拟机。</p><h2 id="简单体验">简单体验</h2><h3 id="整体评价">整体评价</h3><ol><li>在考场上如果提供 NOI Linux 虚拟机的话，可能需要手动安装 VMware Tools （因为没网所以不能装 Open VM Tools），略麻烦。</li><li>系统操作有点卡，不知道是不是因为虚拟机的原因。</li><li>预装的软件部分是处于半残状态的，在考场上无法正常使用。</li><li>编译器版本较新，默认支持一些新的语言特性。</li><li>在考场上推荐使用 Sublime Text 或者 Code::Blocks 进行代码编写，不推荐使用 VSCode 。</li></ol><h3 id="更新">更新</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/MbBrDuQyYpwP9TA.png" alt="" loading="lazy"></p><p>模拟考试环境时不建议安装<strong>任何</strong>更新，以还原考场上的「本真的」NOI Linux 。如果需要日常使用则建议安装更新。</p><h3 id="vscode">VSCode</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/vs2mDg5KCO61n8X.png" alt="" loading="lazy"></p><p>CCF 预置在 NOI Linux 2.0 中的 VSCode 只能当一个编辑器，并且并没有安装中文语言包和完整的 C/C++ 扩展，处于半残状态。</p><h3 id="sublime-text">Sublime Text</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/TuEGMtsYcndIoNm.png" alt="" loading="lazy"></p><p>相比于 VSCode ，NOI Linux 预装的 Sublime Text 的自动补全功能在始终离线的环境下依旧能正常工作，同时 Sublime Text 也支持单文件编译运行，颜值也不低，写起代码来很舒服。</p><h3 id="code-blocks">Code::Blocks</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/J598DiCRqthEgTS.png" alt="" loading="lazy"></p><p>Code::Blocks 是一个免费、开源、跨平台的集成开发环境，可以在 <a href="https://www.codeblocks.org/" rel="external nofollow noreferrer">codeblocks.org</a> 上找到系统对应版本的 Code::Blocks 预编译二进制包及其源码。</p><p>NOI Linux 中内置的 Code::Blocks 的自动补全、代码提示等功能均能正常使用，且不需要网络连接。</p><h3 id="nano">Nano</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/9BrALjlHxGK54kR.png" alt="" loading="lazy"></p><p>关于 Nano 此处就不再过多叙述，可以在 <a href="https://nano-editor.org" rel="external nofollow noreferrer">The GNU nano homepage</a> 上找到系统对应版本的 Nano 预编译二进制包及其源码。</p><h3 id="emacs">Emacs</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/FQdGqx8bv2oZNJL.png" alt="" loading="lazy"></p><p>笔者并没有深度体验过 Emacs ，所以不做过多评价，在这里推荐一篇入门教程：<a href="https://liujiacai.net/blog/2020/11/25/why-emacs/" rel="external nofollow noreferrer">Emacs 入门指南：Why &amp; How - Keep Coding</a> 。</p><p>可以在 <a href="https://www.gnu.org/software/emacs/" rel="external nofollow noreferrer">GNU Emacs</a> 找到系统对应版本的 Emacs 预编译二进制包及其源码。</p><h3 id="vim">Vim</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/aN9xjIneAYByEXv.png" alt="" loading="lazy"></p><p>Vim 还是老样子，可以在 <a href="https://www.vim.org" rel="external nofollow noreferrer">vim.org</a> 上找到系统对应版本的 Vim 预编译二进制包及其源码，关于 Vim 的使用请参阅 <a href="http://linux.vbird.org/linux_basic/0310vi.php" rel="external nofollow noreferrer">第九章、vim 程式編輯器 - 鳥哥的 Linux 私房菜</a>。</p><h3 id="编译器">编译器</h3><p><img src="https://s1.baoshuo.ren/2021/08/07/lWviXCj9Txqgmr8.png" alt="" loading="lazy"></p><blockquote><p>使用 <code>g++ -dM -E -x c++ /dev/null | grep -F __cplusplus</code> 命令可以查看编译器默认使用的 C++ 标准。</p></blockquote><p>通过上图可以得出 NOI Linux 自带的编译器默认的 C++ 标准是 C++ 14 ，希望 CCF 在比赛评测的时候不要添加 <code>--std=c++98</code> ，同时选手也需要做好无法使用 C++ 14 特性的准备。</p><h3 id="对拍">对拍</h3><p>NOI Linux 2.0 依旧安装了 Arbiter 评测系统，但是由于系统内置了 Python ，所以可以自行编写对拍程序。</p><h2 id="后记-4">后记</h2><p>NOI Linux 的本次更新使得 NOI Linux 系统更加地人性化、更加适合 OIer 们的使用。美中不足的一点是此版本的 NOI Linux 仍然没有卸载 <code>openssh-client</code> 软件包。</p><h2 id="参考资料-9">参考资料</h2><ol><li><a href="https://noi.cn/gynoi/jsgz/2021-07-16/732450.shtml" rel="external nofollow noreferrer">NOI Linux 2.0 发布，将于 9 月 1 日起正式启用！ - noi.cn</a></li><li><a href="https://docs.vmware.com/cn/VMware-Tools/11.3.0/com.vmware.vsphere.vmwaretools.doc/GUID-C48E1F14-240D-4DD1-8D4C-25B6EBE4BB0F.html" rel="external nofollow noreferrer">安装 Open VM Tools - VMware Tools - VMware Docs</a></li></ol>]]></content>
+        <content type="html"><![CDATA[<img src="https://s1.baoshuo.ren/2021/08/15/POMht9fim1vVKcp.png" width="100%" alt="NOI Linux 2.0 上手体验" /><p>时隔多年，CCF 终于发布了新版的 NOI Linux ，替换了以前基于 Ubuntu 14.04 的 NOI Linux 1.4.1。</p><span id="more"></span><p>在 NOI Linux 2.0 发布的当天，我就迫不及待地下载好了镜像（<a href="https://noiresources.ccf.org.cn/ubuntu-noi-v2.0.iso" rel="external nofollow noreferrer"><code>ubuntu-noi-v2.0.iso</code></a>），但由于时间原因，没有第一时间进行体验。</p><h2 id="安装">安装</h2><p>首先先新建好一台虚拟机。</p><p><img src="https://s1.baoshuo.ren/2021/07/25/ceaObqknR3FTtlU.png" alt="" loading="lazy"></p><p>新建虚拟机及挂载镜像的步骤不再过多叙述，在安装时需要断开网络连接。</p><p><img src="https://s1.baoshuo.ren/2021/07/25/PeYV6lquxawzL7b.png" alt="" loading="lazy"></p><p>开屏就是自定义的启动界面。</p><p>安装后需要连接网络，运行 <code>sudo apt update</code> 更新软件包列表，然后安装 <code>open-vm-tools-desktop</code> ，安装完成后建议重启虚拟机。</p><h2 id="简单体验">简单体验</h2><h3 id="整体评价">整体评价</h3><ol><li>在考场上如果提供 NOI Linux 虚拟机的话，可能需要手动安装 VMware Tools （因为没网所以不能装 Open VM Tools），略麻烦。</li><li>系统操作有点卡，不知道是不是因为虚拟机的原因。</li><li>预装的软件部分是处于半残状态的，在考场上无法正常使用。</li><li>编译器版本较新，默认支持一些新的语言特性。</li><li>在考场上推荐使用 Sublime Text 或者 Code::Blocks 进行代码编写，不推荐使用 VSCode 。</li></ol><h3 id="更新">更新</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/MbBrDuQyYpwP9TA.png" alt="" loading="lazy"></p><p>模拟考试环境时不建议安装<strong>任何</strong>更新，以还原考场上的「本真的」NOI Linux 。如果需要日常使用则建议安装更新。</p><h3 id="vscode">VSCode</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/vs2mDg5KCO61n8X.png" alt="" loading="lazy"></p><p>CCF 预置在 NOI Linux 2.0 中的 VSCode 只能当一个编辑器，并且并没有安装中文语言包和完整的 C/C++ 扩展，处于半残状态。</p><h3 id="sublime-text">Sublime Text</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/TuEGMtsYcndIoNm.png" alt="" loading="lazy"></p><p>相比于 VSCode ，NOI Linux 预装的 Sublime Text 的自动补全功能在始终离线的环境下依旧能正常工作，同时 Sublime Text 也支持单文件编译运行，颜值也不低，写起代码来很舒服。</p><h3 id="code-blocks">Code::Blocks</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/J598DiCRqthEgTS.png" alt="" loading="lazy"></p><p>Code::Blocks 是一个免费、开源、跨平台的集成开发环境，可以在 <a href="https://www.codeblocks.org/" rel="external nofollow noreferrer">codeblocks.org</a> 上找到系统对应版本的 Code::Blocks 预编译二进制包及其源码。</p><p>NOI Linux 中内置的 Code::Blocks 的自动补全、代码提示等功能均能正常使用，且不需要网络连接。</p><h3 id="nano">Nano</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/9BrALjlHxGK54kR.png" alt="" loading="lazy"></p><p>关于 Nano 此处就不再过多叙述，可以在 <a href="https://nano-editor.org" rel="external nofollow noreferrer">The GNU nano homepage</a> 上找到系统对应版本的 Nano 预编译二进制包及其源码。</p><h3 id="emacs">Emacs</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/FQdGqx8bv2oZNJL.png" alt="" loading="lazy"></p><p>笔者并没有深度体验过 Emacs ，所以不做过多评价，在这里推荐一篇入门教程：<a href="https://liujiacai.net/blog/2020/11/25/why-emacs/" rel="external nofollow noreferrer">Emacs 入门指南：Why &amp; How - Keep Coding</a> 。</p><p>可以在 <a href="https://www.gnu.org/software/emacs/" rel="external nofollow noreferrer">GNU Emacs</a> 找到系统对应版本的 Emacs 预编译二进制包及其源码。</p><h3 id="vim">Vim</h3><p><img src="https://s1.baoshuo.ren/2021/08/08/aN9xjIneAYByEXv.png" alt="" loading="lazy"></p><p>Vim 还是老样子，可以在 <a href="https://www.vim.org" rel="external nofollow noreferrer">vim.org</a> 上找到系统对应版本的 Vim 预编译二进制包及其源码，关于 Vim 的使用请参阅 <a href="http://linux.vbird.org/linux_basic/0310vi.php" rel="external nofollow noreferrer">第九章、vim 程式編輯器 - 鳥哥的 Linux 私房菜</a>。</p><h3 id="编译器">编译器</h3><p><img src="https://s1.baoshuo.ren/2021/08/07/lWviXCj9Txqgmr8.png" alt="" loading="lazy"></p><blockquote><p>使用 <code>g++ -dM -E -x c++ /dev/null | grep -F __cplusplus</code> 命令可以查看编译器默认使用的 C++ 标准。</p></blockquote><p>通过上图可以得出 NOI Linux 自带的编译器默认的 C++ 标准是 C++ 14 ，希望 CCF 在比赛评测的时候不要添加 <code>--std=c++98</code> ，同时选手也需要做好无法使用 C++ 14 特性的准备。</p><h3 id="对拍">对拍</h3><p>NOI Linux 2.0 依旧安装了 Arbiter 评测系统，但是由于系统内置了 Python ，所以可以自行编写对拍程序。</p><h2 id="后记-4">后记</h2><p>NOI Linux 的本次更新使得 NOI Linux 系统更加地人性化、更加适合 OIer 们的使用。美中不足的一点是此版本的 NOI Linux 仍然没有卸载 <code>openssh-client</code> 软件包。</p><h2 id="参考资料-10">参考资料</h2><ol><li><a href="https://noi.cn/gynoi/jsgz/2021-07-16/732450.shtml" rel="external nofollow noreferrer">NOI Linux 2.0 发布，将于 9 月 1 日起正式启用！ - noi.cn</a></li><li><a href="https://docs.vmware.com/cn/VMware-Tools/11.3.0/com.vmware.vsphere.vmwaretools.doc/GUID-C48E1F14-240D-4DD1-8D4C-25B6EBE4BB0F.html" rel="external nofollow noreferrer">安装 Open VM Tools - VMware Tools - VMware Docs</a></li></ol>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
@@ -205,7 +534,7 @@ xhr.<span class="hljs-title function_">send</span>();</code></pre><p>使用 fetc
 <span class="hljs-attr">PublicKey</span> = ******
 <span class="hljs-attr">AllowedIPs</span> = <span class="hljs-number">0.0</span>.<span class="hljs-number">0.0</span>/<span class="hljs-number">0</span>
 <span class="hljs-attr">AllowedIPs</span> = ::/<span class="hljs-number">0</span>
-<span class="hljs-attr">Endpoint</span> = engage.cloudflareclient.com:<span class="hljs-number">2408</span></code></pre><ul><li>添加 IPv4 网络访问<ol><li>删去 <code>[Interface]</code> 中的 <code>Address = fd01:******/128</code> ；</li><li>删去 <code>[Peer]</code> 中的 <code>AllowedIPs = ::/0</code> ；</li><li>将 Endpoint 的域名替换为解析出来的 IPv6 地址，如 <code>[2606:4700:d0::a29f:c001]:2408</code> 。</li></ol></li><li>添加 IPv6 网络访问<ol><li>删去 <code>[Interface]</code> 中的 <code>Address = 172.16.*.*/32</code> ；</li><li>删去 <code>[Peer]</code> 中的 <code>AllowedIPs = 0.0.0.0/0</code> ；</li><li>将 Endpoint 的域名替换为解析出来的 IPv4 地址，如 <code>162.159.192.1:2408</code> 。</li></ol></li></ul><p>如果不需要使用 Cloudflare 的 DNS 服务可以删去 <code>DNS = 1.1.1.1</code> 这一行，使用的话需要安装 <code>resolvconf</code> 。</p><h2 id="启动-wireguard-隧道">启动 WireGuard 隧道</h2><p>将刚才修改好的配置文件移动到 <code>/etc/wireguard/</code> 目录下，推荐命名为 <code>wgcf.conf</code> ，下面的操作以这个文件名为准。</p><p>使用 <code>systemd enable --now wg-quick@wgcf</code> 命令启动隧道，然后使用 <code>wg show wgcf</code> 命令查看隧道状态。</p><p>如果在启动时出现了错误，可以使用 <code>systemd status wg-quick@wgcf</code> 命令查看错误信息，修复后使用 <code>systemd start wg-quick@wgcf</code> 启动隧道。</p><p><img src="https://s1.baoshuo.ren/2021/07/15/M9D1L2rFfHCPtcU.png" alt="" loading="lazy"></p><p>之后就可以享受双栈网络带来的便利了~</p><p>注：日常如果需要重启隧道可以使用 <code>systemctl restart wg-quick@wgcf</code> 命令。</p><h2 id="后记-8">后记</h2><p>折腾这些的原因是我从某个 Player IX 那里嫖的 VM 没有提供 IPv4 网络访问权限，这让我日常的维护工作麻烦了很多，于是我想到了 Cloudflare Warp 这个东西。CloudFlare Warp 提供的网络访问相较于 <a href="http://TunnelBroker.net" rel="external nofollow noreferrer">TunnelBroker.net</a> 、 <a href="http://TunnelBroker.ch" rel="external nofollow noreferrer">TunnelBroker.ch</a> 等一众隧道要好很多，延迟并不像其他隧道那样高。</p><p>在查找资料的过程中我也发现了很多博客里面所描述的内容有误或已经过时，所以综合其他文章的内容加上自己的实践，写下了这篇文章。</p><h2 id="参考资料-12">参考资料</h2><ol><li><a href="https://luotianyi.vc/5252.html" rel="external nofollow noreferrer">【WGCF】连接 CF WARP 为服务器添加 IPv4/IPv6 网络 - Luminous’ Home</a></li><li><a href="https://p3terx.com/archives/use-cloudflare-warp-to-add-extra-ipv4-or-ipv6-network-support-to-vps-servers-for-free.html" rel="external nofollow noreferrer">Cloudflare WARP 给 VPS 服务器额外添加 IPv4 或 IPv6 网络获得“原生”IP - P3TERX</a></li></ol>]]></content>
+<span class="hljs-attr">Endpoint</span> = engage.cloudflareclient.com:<span class="hljs-number">2408</span></code></pre><ul><li>添加 IPv4 网络访问<ol><li>删去 <code>[Interface]</code> 中的 <code>Address = fd01:******/128</code> ；</li><li>删去 <code>[Peer]</code> 中的 <code>AllowedIPs = ::/0</code> ；</li><li>将 Endpoint 的域名替换为解析出来的 IPv6 地址，如 <code>[2606:4700:d0::a29f:c001]:2408</code> 。</li></ol></li><li>添加 IPv6 网络访问<ol><li>删去 <code>[Interface]</code> 中的 <code>Address = 172.16.*.*/32</code> ；</li><li>删去 <code>[Peer]</code> 中的 <code>AllowedIPs = 0.0.0.0/0</code> ；</li><li>将 Endpoint 的域名替换为解析出来的 IPv4 地址，如 <code>162.159.192.1:2408</code> 。</li></ol></li></ul><p>如果不需要使用 Cloudflare 的 DNS 服务可以删去 <code>DNS = 1.1.1.1</code> 这一行，使用的话需要安装 <code>resolvconf</code> 。</p><h2 id="启动-wireguard-隧道">启动 WireGuard 隧道</h2><p>将刚才修改好的配置文件移动到 <code>/etc/wireguard/</code> 目录下，推荐命名为 <code>wgcf.conf</code> ，下面的操作以这个文件名为准。</p><p>使用 <code>systemd enable --now wg-quick@wgcf</code> 命令启动隧道，然后使用 <code>wg show wgcf</code> 命令查看隧道状态。</p><p>如果在启动时出现了错误，可以使用 <code>systemd status wg-quick@wgcf</code> 命令查看错误信息，修复后使用 <code>systemd start wg-quick@wgcf</code> 启动隧道。</p><p><img src="https://s1.baoshuo.ren/2021/07/15/M9D1L2rFfHCPtcU.png" alt="" loading="lazy"></p><p>之后就可以享受双栈网络带来的便利了~</p><p>注：日常如果需要重启隧道可以使用 <code>systemctl restart wg-quick@wgcf</code> 命令。</p><h2 id="后记-8">后记</h2><p>折腾这些的原因是我从某个 Player IX 那里嫖的 VM 没有提供 IPv4 网络访问权限，这让我日常的维护工作麻烦了很多，于是我想到了 Cloudflare Warp 这个东西。CloudFlare Warp 提供的网络访问相较于 <a href="http://TunnelBroker.net" rel="external nofollow noreferrer">TunnelBroker.net</a> 、 <a href="http://TunnelBroker.ch" rel="external nofollow noreferrer">TunnelBroker.ch</a> 等一众隧道要好很多，延迟并不像其他隧道那样高。</p><p>在查找资料的过程中我也发现了很多博客里面所描述的内容有误或已经过时，所以综合其他文章的内容加上自己的实践，写下了这篇文章。</p><h2 id="参考资料-13">参考资料</h2><ol><li><a href="https://luotianyi.vc/5252.html" rel="external nofollow noreferrer">【WGCF】连接 CF WARP 为服务器添加 IPv4/IPv6 网络 - Luminous’ Home</a></li><li><a href="https://p3terx.com/archives/use-cloudflare-warp-to-add-extra-ipv4-or-ipv6-network-support-to-vps-servers-for-free.html" rel="external nofollow noreferrer">Cloudflare WARP 给 VPS 服务器额外添加 IPv4 或 IPv6 网络获得“原生”IP - P3TERX</a></li></ol>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
@@ -492,7 +821,7 @@ sysctl -p</code></pre><p>除此之外，还需要关闭一些自动化的配置 
     source address &lt;本地的链路本地地址&gt;;
 &#125;</code></pre><p>否则按照下面的配置示例进行配置：</p><pre><code class="hljs bird">protocol bgp &lt;名字&gt; from dnpeers &#123;
     neighbor &lt;对端 IPv6 地址&gt; as &lt;对端 ASN&gt;;
-&#125;</code></pre><p>然后使用 <code>birdc configure</code> 重载配置即可。</p><h2 id="更新日志">更新日志</h2><ul><li>2021-04-04 第一版 <sup>（2021 年 8 月 10 日存档于 <a href="https://web.archive.org/web/20210810062825/https://blog.baoshuo.ren/post/dn42-network/" rel="external nofollow noreferrer">互联网档案馆</a>）</sup></li><li>2021-08-14 第二版</li></ul><h2 id="参考资料-4">参考资料</h2><ol><li><a href="https://dn42.dev/howto/Getting-Started" rel="external nofollow noreferrer">Getting Started - DN42 Wiki</a></li><li><a href="https://git.dn42.dev/dn42/registry/src/branch/master/README.md" rel="external nofollow noreferrer">Guide for creating a Pull Request - dn42/registry - DN42 Git</a></li><li><a href="https://lantian.pub/article/modify-website/dn42-experimental-network-2020.lantian/" rel="external nofollow noreferrer">DN42 实验网络介绍及注册教程（2020-10-01 更新） - Lan Tian @ Blog</a></li><li><a href="https://datatracker.ietf.org/" rel="external nofollow noreferrer">IETF Datatracker</a></li><li><a href="https://en.wikipedia.org/wiki/Unique_local_address" rel="external nofollow noreferrer">Unique local address - Wikipedia</a></li><li><a href="https://github.com/moesoha/bird-bgp-kickstart" rel="external nofollow noreferrer">BIRD 与 BGP 的新手开场 - Soha Jin - GitHub</a></li></ol>]]></content>
+&#125;</code></pre><p>然后使用 <code>birdc configure</code> 重载配置即可。</p><h2 id="更新日志">更新日志</h2><ul><li>2021-04-04 第一版 <sup>（2021 年 8 月 10 日存档于 <a href="https://web.archive.org/web/20210810062825/https://blog.baoshuo.ren/post/dn42-network/" rel="external nofollow noreferrer">互联网档案馆</a>）</sup></li><li>2021-08-14 第二版</li></ul><h2 id="参考资料-5">参考资料</h2><ol><li><a href="https://dn42.dev/howto/Getting-Started" rel="external nofollow noreferrer">Getting Started - DN42 Wiki</a></li><li><a href="https://git.dn42.dev/dn42/registry/src/branch/master/README.md" rel="external nofollow noreferrer">Guide for creating a Pull Request - dn42/registry - DN42 Git</a></li><li><a href="https://lantian.pub/article/modify-website/dn42-experimental-network-2020.lantian/" rel="external nofollow noreferrer">DN42 实验网络介绍及注册教程（2020-10-01 更新） - Lan Tian @ Blog</a></li><li><a href="https://datatracker.ietf.org/" rel="external nofollow noreferrer">IETF Datatracker</a></li><li><a href="https://en.wikipedia.org/wiki/Unique_local_address" rel="external nofollow noreferrer">Unique local address - Wikipedia</a></li><li><a href="https://github.com/moesoha/bird-bgp-kickstart" rel="external nofollow noreferrer">BIRD 与 BGP 的新手开场 - Soha Jin - GitHub</a></li></ol>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
@@ -525,7 +854,7 @@ From,
 [姓名]
 [公司名称]
 [职位, 如 Network Administrator]
-[电话号码]</code></pre></details><p><img src="https://s1.baoshuo.ren/2021/03/13/nbQxcZLFNV6KBgP.png" alt="" loading="lazy"></p><p>提交完毕之后会出现如图所示的界面，点击 <strong>Start</strong> 即可开始验证进程。</p><p><img src="https://s1.baoshuo.ren/2021/03/13/6QKhFL4PGxoeEXn.png" alt="" loading="lazy"></p><p>以 AS141776 的验证为例，选择好接收验证邮件的邮箱，然后点击 <strong>Send</strong> 即可。</p><p><img src="https://s1.baoshuo.ren/2021/03/13/rE4txqgBLeZK9Ou.png" alt="" loading="lazy"></p><p><img src="https://s1.baoshuo.ren/2021/03/13/rAOSIP5oezGRqpc.png" alt="" loading="lazy"></p><p>点击邮箱里的链接即可（第一个是允许，第二个是拒绝）</p><p><img src="https://s1.baoshuo.ren/2021/03/13/xBXiqmukOQbZT6r.png" alt="" loading="lazy"></p><p>验证成功后的提示。</p><p>之后等待客服开通即可。</p><p>由于我是在晚上申请的 Vultr BGP 服务，所以几分钟就开通好了。</p><p><img src="https://s1.baoshuo.ren/2021/03/13/2aLwgPWHzlxF9DY.png" alt="" loading="lazy"></p><p>之后不要忘记去控制台重启实例哦~</p><h2 id="使用-bird2-广播-ip">使用 BIRD2 广播 IP</h2><p>可以参考我在 <a href="/post/dn42-network/#dn42-bird2-%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8">初探 DN42 网络</a> 这篇文章的「DN42 BIRD2 使用入门」一节中描述的步骤，此处不再赘述。</p><p>如果不会写配置文件可以参考 <a href="https://github.com/renbaoshuo/network-configs" rel="external nofollow noreferrer">renbaoshuo/network-configs</a> 仓库中的配置。</p><h2 id="一些注意事项">一些注意事项</h2><h3 id="拆分-ip-段">拆分 IP 段</h3><p>由于我一下子用不了那么多 IP ，所以我决定把我的 <code>/44</code> 拆分成几个 <code>/48</code> 来用。</p><p>如果不涉及 whois 信息的修改操作，那么只需要修改一下 bird 的配置分开广播即可。</p><p>APNIC 修改 whois 信息的流程可以参考 <a href="https://www.apnic.net/manage-ip/using-whois/updating-whois/objects/email-updates/" rel="external nofollow noreferrer">Sending updates by email - APNIC</a> 页面上的指引发送邮件。</p><h3 id="网络交换中心（internet-exchange）">网络交换中心（Internet Exchange）</h3><p>加 IX 的操作流程和 Peer 差不多，注意只发送自己和自己下游（如果有）的路由，不能把上游发来的路由也塞进去，否则会被断开连接。</p><h2 id="名词释义">名词释义</h2><ul><li>LIR: 本地互联网注册机构</li><li>RIR: 区域互联网注册机构 （<a href="https://zh.wikipedia.org/zh-cn/%E5%8C%BA%E5%9F%9F%E4%BA%92%E8%81%94%E7%BD%91%E6%B3%A8%E5%86%8C%E7%AE%A1%E7%90%86%E6%9C%BA%E6%9E%84" rel="external nofollow noreferrer">维基百科</a>）</li><li>ASN: 自治系统编号（<a href="https://zh.wikipedia.org/zh-cn/%E8%87%AA%E6%B2%BB%E7%B3%BB%E7%BB%9F" rel="external nofollow noreferrer">维基百科</a>）</li><li>BGP: 边界网关协议（<a href="https://zh.wikipedia.org/zh-cn/%E8%BE%B9%E7%95%8C%E7%BD%91%E5%85%B3%E5%8D%8F%E8%AE%AE" rel="external nofollow noreferrer">维基百科</a>）</li><li>BIRD: 一个功能齐全的动态 IP 路由守护程序（<a href="https://bird.network.cz" rel="external nofollow noreferrer">官方网站</a>）</li></ul><h2 id="参考资料-7">参考资料</h2><ol><li><a href="https://www.vultr.com/docs/example-letter-of-authorization-for-bgp-announcements" rel="external nofollow noreferrer">Example Letter of Authorization for BGP Announcements</a>，Vultr Docs。</li><li><a href="https://blog.lsc.moe/post/12/" rel="external nofollow noreferrer">IP 广播 : CentOS 7 使用 bird6 广播 IPv6</a>，LiCEO。</li><li><a href="/post/dn42-network/">初探 DN42 网络</a>，宝硕博客。</li><li><a href="https://hex.moe/p/c5ad0614/" rel="external nofollow noreferrer">年轻人的第一个私人BGP(一) - 注册一个ASN</a>，LovelyWei’s 废纸篓。</li><li><a href="https://hex.moe/p/d6a20b99/" rel="external nofollow noreferrer">年轻人的第一个私人BGP(二) - 广播你的IP</a>，LovelyWei’s 废纸篓。</li></ol>]]></content>
+[电话号码]</code></pre></details><p><img src="https://s1.baoshuo.ren/2021/03/13/nbQxcZLFNV6KBgP.png" alt="" loading="lazy"></p><p>提交完毕之后会出现如图所示的界面，点击 <strong>Start</strong> 即可开始验证进程。</p><p><img src="https://s1.baoshuo.ren/2021/03/13/6QKhFL4PGxoeEXn.png" alt="" loading="lazy"></p><p>以 AS141776 的验证为例，选择好接收验证邮件的邮箱，然后点击 <strong>Send</strong> 即可。</p><p><img src="https://s1.baoshuo.ren/2021/03/13/rE4txqgBLeZK9Ou.png" alt="" loading="lazy"></p><p><img src="https://s1.baoshuo.ren/2021/03/13/rAOSIP5oezGRqpc.png" alt="" loading="lazy"></p><p>点击邮箱里的链接即可（第一个是允许，第二个是拒绝）</p><p><img src="https://s1.baoshuo.ren/2021/03/13/xBXiqmukOQbZT6r.png" alt="" loading="lazy"></p><p>验证成功后的提示。</p><p>之后等待客服开通即可。</p><p>由于我是在晚上申请的 Vultr BGP 服务，所以几分钟就开通好了。</p><p><img src="https://s1.baoshuo.ren/2021/03/13/2aLwgPWHzlxF9DY.png" alt="" loading="lazy"></p><p>之后不要忘记去控制台重启实例哦~</p><h2 id="使用-bird2-广播-ip">使用 BIRD2 广播 IP</h2><p>可以参考我在 <a href="/post/dn42-network/#dn42-bird2-%E4%BD%BF%E7%94%A8%E5%85%A5%E9%97%A8">初探 DN42 网络</a> 这篇文章的「DN42 BIRD2 使用入门」一节中描述的步骤，此处不再赘述。</p><p>如果不会写配置文件可以参考 <a href="https://github.com/renbaoshuo/network-configs" rel="external nofollow noreferrer">renbaoshuo/network-configs</a> 仓库中的配置。</p><h2 id="一些注意事项">一些注意事项</h2><h3 id="拆分-ip-段">拆分 IP 段</h3><p>由于我一下子用不了那么多 IP ，所以我决定把我的 <code>/44</code> 拆分成几个 <code>/48</code> 来用。</p><p>如果不涉及 whois 信息的修改操作，那么只需要修改一下 bird 的配置分开广播即可。</p><p>APNIC 修改 whois 信息的流程可以参考 <a href="https://www.apnic.net/manage-ip/using-whois/updating-whois/objects/email-updates/" rel="external nofollow noreferrer">Sending updates by email - APNIC</a> 页面上的指引发送邮件。</p><h3 id="网络交换中心（internet-exchange）">网络交换中心（Internet Exchange）</h3><p>加 IX 的操作流程和 Peer 差不多，注意只发送自己和自己下游（如果有）的路由，不能把上游发来的路由也塞进去，否则会被断开连接。</p><h2 id="名词释义">名词释义</h2><ul><li>LIR: 本地互联网注册机构</li><li>RIR: 区域互联网注册机构 （<a href="https://zh.wikipedia.org/zh-cn/%E5%8C%BA%E5%9F%9F%E4%BA%92%E8%81%94%E7%BD%91%E6%B3%A8%E5%86%8C%E7%AE%A1%E7%90%86%E6%9C%BA%E6%9E%84" rel="external nofollow noreferrer">维基百科</a>）</li><li>ASN: 自治系统编号（<a href="https://zh.wikipedia.org/zh-cn/%E8%87%AA%E6%B2%BB%E7%B3%BB%E7%BB%9F" rel="external nofollow noreferrer">维基百科</a>）</li><li>BGP: 边界网关协议（<a href="https://zh.wikipedia.org/zh-cn/%E8%BE%B9%E7%95%8C%E7%BD%91%E5%85%B3%E5%8D%8F%E8%AE%AE" rel="external nofollow noreferrer">维基百科</a>）</li><li>BIRD: 一个功能齐全的动态 IP 路由守护程序（<a href="https://bird.network.cz" rel="external nofollow noreferrer">官方网站</a>）</li></ul><h2 id="参考资料-8">参考资料</h2><ol><li><a href="https://www.vultr.com/docs/example-letter-of-authorization-for-bgp-announcements" rel="external nofollow noreferrer">Example Letter of Authorization for BGP Announcements</a>，Vultr Docs。</li><li><a href="https://blog.lsc.moe/post/12/" rel="external nofollow noreferrer">IP 广播 : CentOS 7 使用 bird6 广播 IPv6</a>，LiCEO。</li><li><a href="/post/dn42-network/">初探 DN42 网络</a>，宝硕博客。</li><li><a href="https://hex.moe/p/c5ad0614/" rel="external nofollow noreferrer">年轻人的第一个私人BGP(一) - 注册一个ASN</a>，LovelyWei’s 废纸篓。</li><li><a href="https://hex.moe/p/d6a20b99/" rel="external nofollow noreferrer">年轻人的第一个私人BGP(二) - 广播你的IP</a>，LovelyWei’s 废纸篓。</li></ol>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
@@ -703,7 +1032,7 @@ workbox.<span class="hljs-property">routing</span>.<span class="hljs-title funct
   <span class="hljs-keyword">new</span> workbox.<span class="hljs-property">strategies</span>.<span class="hljs-title class_">NetworkFirst</span>(&#123;
     <span class="hljs-attr">networkTimeoutSeconds</span>: <span class="hljs-number">3</span>,
   &#125;)
-);</code></pre><h2 id="参考资料-13">参考资料</h2><p><em>文章头图来自：<a href="https://developers.google.com/web/tools/workbox" rel="external nofollow noreferrer">https://developers.google.com/web/tools/workbox</a></em></p><p><em><a href="#Workbox-%E7%AD%96%E7%95%A5">Workbox 策略</a> 一节中的配图来自：<a href="https://web.dev/offline-cookbook/" rel="external nofollow noreferrer">https://web.dev/offline-cookbook/</a></em></p><ul><li><a href="https://developers.google.com/web/tools/workbox/" rel="external nofollow noreferrer">Workbox - Google Developers</a></li><li><a href="https://blog.skk.moe/post/hello-workbox/" rel="external nofollow noreferrer">Workbox, not sw-toolbox &amp; sw-precache - Sukka’s Blog</a></li><li><a href="https://github.com/GoogleChrome/workbox" rel="external nofollow noreferrer">GoogleChrome/workbox - GitHub</a></li><li><a href="https://web.dev/offline-cookbook/#serving-suggestions" rel="external nofollow noreferrer">The Offline Cookbook - web.dev</a></li></ul>]]></content>
+);</code></pre><h2 id="参考资料-14">参考资料</h2><p><em>文章头图来自：<a href="https://developers.google.com/web/tools/workbox" rel="external nofollow noreferrer">https://developers.google.com/web/tools/workbox</a></em></p><p><em><a href="#Workbox-%E7%AD%96%E7%95%A5">Workbox 策略</a> 一节中的配图来自：<a href="https://web.dev/offline-cookbook/" rel="external nofollow noreferrer">https://web.dev/offline-cookbook/</a></em></p><ul><li><a href="https://developers.google.com/web/tools/workbox/" rel="external nofollow noreferrer">Workbox - Google Developers</a></li><li><a href="https://blog.skk.moe/post/hello-workbox/" rel="external nofollow noreferrer">Workbox, not sw-toolbox &amp; sw-precache - Sukka’s Blog</a></li><li><a href="https://github.com/GoogleChrome/workbox" rel="external nofollow noreferrer">GoogleChrome/workbox - GitHub</a></li><li><a href="https://web.dev/offline-cookbook/#serving-suggestions" rel="external nofollow noreferrer">The Offline Cookbook - web.dev</a></li></ul>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
@@ -931,7 +1260,7 @@ darkModeTogglebuttonElement.<span class="hljs-title function_">addEventListener<
   <span class="hljs-attribute">color</span>-scheme: dark;
 &#125;</code></pre><h2 id="disqus-相关">Disqus 相关</h2><p>如果网页上有 Disqus 评论系统，请添加下方的 CSS 以避免 Disqus 的自动深色模式失效。</p><pre><code class="hljs css"><span class="hljs-selector-tag">iframe</span> &#123;
   <span class="hljs-attribute">color</span>-scheme: light;
-&#125;</code></pre><p><em>来源：<a href="https://stackoverflow.com/a/65313819/14109955" rel="external nofollow noreferrer">Disqus iframe transparency won’t work on Chrome 87 - StackOverflow</a></em></p><h2 id="参考资料-3">参考资料</h2><ol><li><a href="https://material.io/design/color/dark-theme.html" rel="external nofollow noreferrer">Dark theme - Material Design</a></li><li><a href="https://developer.apple.com/videos/play/wwdc2019/808/" rel="external nofollow noreferrer">What’s New in iOS Design - WWDC 2019</a></li><li><a href="https://blog.skk.moe/post/hello-darkmode-my-old-friend/" rel="external nofollow noreferrer">你好黑暗，我的老朋友 —— 为网站添加用户友好的深色模式支持 - Sukka’s Blog</a></li><li><a href="https://web.dev/color-scheme/" rel="external nofollow noreferrer">Improved dark mode default styling with the color-scheme CSS property and the corresponding meta tag - web.dev</a></li></ol><p><em>文章头图来自：<a href="https://material.io/design/color/dark-theme.html" rel="external nofollow noreferrer">https://material.io/design/color/dark-theme.html</a></em></p>]]></content>
+&#125;</code></pre><p><em>来源：<a href="https://stackoverflow.com/a/65313819/14109955" rel="external nofollow noreferrer">Disqus iframe transparency won’t work on Chrome 87 - StackOverflow</a></em></p><h2 id="参考资料-4">参考资料</h2><ol><li><a href="https://material.io/design/color/dark-theme.html" rel="external nofollow noreferrer">Dark theme - Material Design</a></li><li><a href="https://developer.apple.com/videos/play/wwdc2019/808/" rel="external nofollow noreferrer">What’s New in iOS Design - WWDC 2019</a></li><li><a href="https://blog.skk.moe/post/hello-darkmode-my-old-friend/" rel="external nofollow noreferrer">你好黑暗，我的老朋友 —— 为网站添加用户友好的深色模式支持 - Sukka’s Blog</a></li><li><a href="https://web.dev/color-scheme/" rel="external nofollow noreferrer">Improved dark mode default styling with the color-scheme CSS property and the corresponding meta tag - web.dev</a></li></ol><p><em>文章头图来自：<a href="https://material.io/design/color/dark-theme.html" rel="external nofollow noreferrer">https://material.io/design/color/dark-theme.html</a></em></p>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
@@ -1042,90 +1371,7 @@ darkModeTogglebuttonElement.<span class="hljs-title function_">addEventListener<
 <span class="hljs-attr">Requires</span>=basic.target
 <span class="hljs-attr">Conflicts</span>=rescue.service rescue.target
 <span class="hljs-attr">After</span>=basic.target rescue.service rescue.target
-<span class="hljs-attr">AllowIsolate</span>=<span class="hljs-literal">yes</span></code></pre><ul><li><code>Requires</code>: 要求于某个 Target 一起运行</li><li><code>Conflicts</code>: 冲突的 Target</li><li><code>After</code>: 在哪些 Target 之后启动</li><li><code>AllowIsolate</code>: 是否允许使用 <code>systemctl isolate</code> 命令切换到这个 Target</li></ul><h2 id="参考资料-6">参考资料</h2><ol><li><a href="https://en.wikipedia.org/wiki/Systemd" rel="external nofollow noreferrer">Systemd - Wikipedia</a> <sup>（<a href="https://web.archive.org/web/20210210150200/https://en.wikipedia.org/wiki/Systemd" rel="external nofollow noreferrer">存档</a> 于 <a href="https://archive.org" rel="external nofollow noreferrer">互联网档案馆</a>）</sup></li><li><a href="https://manpages.ubuntu.com/manpages/bionic/zh_CN/man1/systemctl.1.html" rel="external nofollow noreferrer">Systemd - Ubuntu Manpages</a> <sup>（<a href="https://web.archive.org/web/20210210150518/https://manpages.ubuntu.com/manpages/bionic/zh_CN/man1/systemctl.1.html" rel="external nofollow noreferrer">存档</a> 于 <a href="https://archive.org" rel="external nofollow noreferrer">互联网档案馆</a>）</sup></li><li><a href="http://linux.vbird.org/linux_basic/0560daemons.php" rel="external nofollow noreferrer">第十七章 认识系统服务(daemons) - 鸟哥的 Linux 私房菜</a> <sup>（<a href="https://web.archive.org/web/20200810204650/http://linux.vbird.org/linux_basic/0560daemons.php" rel="external nofollow noreferrer">存档</a> 于 <a href="https://archive.org" rel="external nofollow noreferrer">互联网档案馆</a>）</sup></li></ol>]]></content>
-        <author>
-            <name>宝硕</name>
-            <uri>https://baoshuo.ren</uri>
-        </author>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[你好，2021 —— 博客迁移记录]]></title>
-        <id>/post/hello-2021/</id>
-        <link href="/post/hello-2021/"/>
-        <updated>2020-12-31T16:00:00.000Z</updated>
-        <summary type="html"><![CDATA[再见，2020。]]></summary>
-        <content type="html"><![CDATA[<p>再见，2020。</p><span id="more"></span><p>最近总是觉得博客太慢了，于是乎，我把博客迁移到自己的服务器上面了。</p><h2 id="服务器端操作">服务器端操作</h2><h3 id="安装-nginx">安装 nginx</h3><p>apt 一把梭，省时又省力。</p><pre><code class="hljs shell">apt install nginx -y</code></pre><h3 id="配置-nginx">配置 nginx</h3><p>简简单单配置了一下，没有什么过于复杂的东西。</p><p>在申请 SSL 证书之前，不要写 HTTPS 的配置。</p><pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
-    <span class="hljs-attribute">listen</span>      <span class="hljs-number">80</span>;
-    <span class="hljs-attribute">listen</span>      [::]:<span class="hljs-number">80</span>;
-    <span class="hljs-attribute">server_name</span> blog.baoshuo.ren;
-
-    <span class="hljs-comment"># ACME-challenge</span>
-    <span class="hljs-section">location</span><span class="hljs-regexp"> ^~</span> /.well-known/acme-challenge/ &#123;
-        <span class="hljs-attribute">allow</span> all;
-        <span class="hljs-attribute">root</span> /var/www/_letsencrypt;
-    &#125;
-
-    <span class="hljs-section">location</span> / &#123;
-        <span class="hljs-attribute">return</span> <span class="hljs-number">301</span> https://blog.baoshuo.ren<span class="hljs-variable">$request_uri</span>;
-    &#125;
-&#125;</code></pre><h3 id="申请-ssl-证书">申请 SSL 证书</h3><p>由于笔者懒得每年换证书，所以就用了 <a href="https://letsencrypt.org/" rel="external nofollow noreferrer">Let’s Encrypt</a> + <a href="https://acme.sh" rel="external nofollow noreferrer">acme.sh</a> 的组合套装来配置 SSL 。 当然，ECC 证书也是少不了的。</p><pre><code class="hljs bash">acme.sh --issue -d baoshuo.ren -d www.baoshuo.ren -d blog.baoshuo.ren \
-    -w /var/www/_letsencrypt/ \
-    --renew-hook <span class="hljs-string">&quot;acme.sh --install-cert -d baoshuo.ren \</span>
-<span class="hljs-string">    --key-file /***/baoshuo.ren.key \</span>
-<span class="hljs-string">    --fullchain-file /***/baoshuo.ren.cer \</span>
-<span class="hljs-string">    --reloadcmd \&quot;service nginx force-reload\&quot;&quot;</span>
-acme.sh --issue --keylength ec-256 \
-    -d baoshuo.ren -d www.baoshuo.ren -d blog.baoshuo.ren \
-    -w /var/www/_letsencrypt/ \
-    --renew-hook <span class="hljs-string">&quot;acme.sh --install-cert -d baoshuo.ren --ecc \</span>
-<span class="hljs-string">    --key-file /***/baoshuo.ren.ecc.key \</span>
-<span class="hljs-string">    --fullchain-file /***/baoshuo.ren.ecc.cer \</span>
-<span class="hljs-string">    --reloadcmd \&quot;service nginx force-reload\&quot;&quot;</span></code></pre><p>申请完成后，将 RSA 和 ECC 证书添加到 nginx 配置中，在配置文件中写入以下内容：</p><pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
-    <span class="hljs-attribute">listen</span>                               <span class="hljs-number">443</span> ssl http2;
-    <span class="hljs-attribute">listen</span>                               [::]:<span class="hljs-number">443</span> ssl http2;
-    <span class="hljs-attribute">server_name</span>                          blog.baoshuo.ren;
-    <span class="hljs-attribute">root</span>                                 /var/www/blog/;
-
-    <span class="hljs-comment"># SSL</span>
-    <span class="hljs-attribute">ssl_certificate</span>                      /***/baoshuo.ren.cer;
-    <span class="hljs-attribute">ssl_certificate_key</span>                  /***/baoshuo.ren.key;
-    <span class="hljs-attribute">ssl_certificate</span>                      /***/baoshuo.ren.ecc.cer;
-    <span class="hljs-attribute">ssl_certificate_key</span>                  /***/baoshuo.ren.ecc.key;
-    <span class="hljs-attribute">ssl_protocols</span>                        TLSv1.<span class="hljs-number">2</span> TLSv1.<span class="hljs-number">3</span>;
-    <span class="hljs-attribute">ssl_ciphers</span>                          ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-    <span class="hljs-attribute">ssl_prefer_server_ciphers</span> <span class="hljs-literal">off</span>;
-
-    <span class="hljs-comment"># HSTS</span>
-    <span class="hljs-attribute">add_header</span> Strict-Transport-Security <span class="hljs-string">&#x27;max-age=31536000&#x27;</span>;
-
-    <span class="hljs-comment"># logging</span>
-    <span class="hljs-attribute">error_log</span>                            /var/log/nginx/blog.baoshuo.ren.<span class="hljs-literal">error</span>.log <span class="hljs-literal">warn</span>;
-
-    <span class="hljs-comment"># 404 page</span>
-    <span class="hljs-attribute">error_page</span>                           <span class="hljs-number">404</span> /<span class="hljs-number">404</span>.html;
-&#125;</code></pre><p>上方使用的 SSL 配置是 Mozilla 推荐的现代化配置 ，如果需要更好的兼容性，可以使用 Mozilla 提供的中等安全性配置 ：</p><pre><code class="hljs ruby">ssl_protocols TLSv1 TLSv1.<span class="hljs-number">1</span> TLSv1.<span class="hljs-number">2</span> TLSv1.<span class="hljs-number">3</span>;
-ssl_ciphers <span class="hljs-variable constant_">ECDHE</span>-<span class="hljs-variable constant_">ECDSA</span>-<span class="hljs-variable constant_">AES128</span>-<span class="hljs-variable constant_">GCM</span>-<span class="hljs-variable constant_">SHA256</span><span class="hljs-symbol">:ECDHE-RSA-AES128-GCM-SHA256</span><span class="hljs-symbol">:ECDHE-ECDSA-AES256-GCM-SHA384</span><span class="hljs-symbol">:ECDHE-RSA-AES256-GCM-SHA384</span><span class="hljs-symbol">:ECDHE-ECDSA-CHACHA20-POLY1305</span><span class="hljs-symbol">:ECDHE-RSA-CHACHA20-POLY1305</span><span class="hljs-symbol">:DHE-RSA-AES128-GCM-SHA256</span><span class="hljs-symbol">:DHE-RSA-AES256-GCM-SHA384</span><span class="hljs-symbol">:DHE-RSA-CHACHA20-POLY1305</span><span class="hljs-symbol">:ECDHE-ECDSA-AES128-SHA256</span><span class="hljs-symbol">:ECDHE-RSA-AES128-SHA256</span><span class="hljs-symbol">:ECDHE-ECDSA-AES128-SHA</span><span class="hljs-symbol">:ECDHE-RSA-AES128-SHA</span><span class="hljs-symbol">:ECDHE-ECDSA-AES256-SHA384</span><span class="hljs-symbol">:ECDHE-RSA-AES256-SHA384</span><span class="hljs-symbol">:ECDHE-ECDSA-AES256-SHA</span><span class="hljs-symbol">:ECDHE-RSA-AES256-SHA</span><span class="hljs-symbol">:DHE-RSA-AES128-SHA256</span><span class="hljs-symbol">:DHE-RSA-AES256-SHA256</span><span class="hljs-symbol">:AES128-GCM-SHA256</span><span class="hljs-symbol">:AES256-GCM-SHA384</span><span class="hljs-symbol">:AES128-SHA256</span><span class="hljs-symbol">:AES256-SHA256</span><span class="hljs-symbol">:AES128-SHA</span><span class="hljs-symbol">:AES256-SHA</span><span class="hljs-symbol">:DES-CBC3-SHA</span>;
-ssl_prefer_server_ciphers on;</code></pre><h2 id="将博客文件同步到服务器上">将博客文件同步到服务器上</h2><p>在 <code>.github/workflows</code> 目录下创建一个 <code>server.yml</code> 文件，写入以下内容：</p><pre><code class="hljs yaml"><span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">blog</span> <span class="hljs-string">to</span> <span class="hljs-string">Server</span>
-
-<span class="hljs-attr">on:</span>
-  <span class="hljs-attr">push:</span>
-    <span class="hljs-attr">branches:</span> [ <span class="hljs-string">master</span> ]
-  <span class="hljs-attr">workflow_dispatch:</span>
-
-<span class="hljs-attr">jobs:</span>
-  <span class="hljs-attr">deploy:</span>
-    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
-    <span class="hljs-attr">steps:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span>
-        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span>
-        <span class="hljs-attr">uses:</span> <span class="hljs-string">easingthemes/ssh-deploy@v2.1.5</span>
-        <span class="hljs-attr">env:</span>
-          <span class="hljs-attr">SSH_PRIVATE_KEY:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.SSH_PRIVATE_KEY</span> <span class="hljs-string">&#125;&#125;</span>
-          <span class="hljs-attr">ARGS:</span> <span class="hljs-string">&quot;-avz --delete  --exclude &#x27;.git/*&#x27; --exclude &#x27;.github/*&#x27; --exclude &#x27;.gitlab-ci.yml&#x27; --exclude &#x27;.nojekyll&#x27;&quot;</span>
-          <span class="hljs-attr">REMOTE_HOST:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.REMOTE_HOST</span> <span class="hljs-string">&#125;&#125;</span>
-          <span class="hljs-attr">REMOTE_USER:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.REMOTE_USER</span> <span class="hljs-string">&#125;&#125;</span>
-          <span class="hljs-attr">TARGET:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.TARGET</span> <span class="hljs-string">&#125;&#125;</span></code></pre><p>之后在 <code>https://github.com/&#123;username&#125;/&#123;repo&#125;/settings/secrets/actions</code> 中添加四个 Secrets 。</p><table><thead><tr><th>名称</th><th>内容</th></tr></thead><tbody><tr><td>REMOTE_HOST</td><td>服务器 IP 地址</td></tr><tr><td>REMOTE_USER</td><td>服务器用户名</td></tr><tr><td>SSH_PRIVATE_KEY</td><td>连接到服务器的 SSH 私钥</td></tr><tr><td>TARGET</td><td>存放文件的路径</td></tr></tbody></table><p>将博客文件 push 到仓库中，就能在服务器上查看到文件了。</p><h2 id="参考资料-5">参考资料</h2><ol><li><a href="https://ssl-config.mozilla.org/#server=nginx&amp;version=1.18.0&amp;config=modern&amp;openssl=1.1.1f&amp;ocsp=false&amp;guideline=5.6" rel="external nofollow noreferrer">nginx 1.18.0, modern config, OpenSSL 1.1.1f - Mozilla SSL Configuration Generator</a></li><li><a href="https://ssl-config.mozilla.org/#server=nginx&amp;version=1.18.0&amp;config=intermediate&amp;openssl=1.1.1f&amp;ocsp=false&amp;guideline=5.6" rel="external nofollow noreferrer">nginx 1.18.0, intermediate config, OpenSSL 1.1.1f - Mozilla SSL Configuration Generator</a></li></ol>]]></content>
+<span class="hljs-attr">AllowIsolate</span>=<span class="hljs-literal">yes</span></code></pre><ul><li><code>Requires</code>: 要求于某个 Target 一起运行</li><li><code>Conflicts</code>: 冲突的 Target</li><li><code>After</code>: 在哪些 Target 之后启动</li><li><code>AllowIsolate</code>: 是否允许使用 <code>systemctl isolate</code> 命令切换到这个 Target</li></ul><h2 id="参考资料-7">参考资料</h2><ol><li><a href="https://en.wikipedia.org/wiki/Systemd" rel="external nofollow noreferrer">Systemd - Wikipedia</a> <sup>（<a href="https://web.archive.org/web/20210210150200/https://en.wikipedia.org/wiki/Systemd" rel="external nofollow noreferrer">存档</a> 于 <a href="https://archive.org" rel="external nofollow noreferrer">互联网档案馆</a>）</sup></li><li><a href="https://manpages.ubuntu.com/manpages/bionic/zh_CN/man1/systemctl.1.html" rel="external nofollow noreferrer">Systemd - Ubuntu Manpages</a> <sup>（<a href="https://web.archive.org/web/20210210150518/https://manpages.ubuntu.com/manpages/bionic/zh_CN/man1/systemctl.1.html" rel="external nofollow noreferrer">存档</a> 于 <a href="https://archive.org" rel="external nofollow noreferrer">互联网档案馆</a>）</sup></li><li><a href="http://linux.vbird.org/linux_basic/0560daemons.php" rel="external nofollow noreferrer">第十七章 认识系统服务(daemons) - 鸟哥的 Linux 私房菜</a> <sup>（<a href="https://web.archive.org/web/20200810204650/http://linux.vbird.org/linux_basic/0560daemons.php" rel="external nofollow noreferrer">存档</a> 于 <a href="https://archive.org" rel="external nofollow noreferrer">互联网档案馆</a>）</sup></li></ol>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
