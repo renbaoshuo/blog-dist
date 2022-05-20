@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://blog.baoshuo.ren</id>
     <title>宝硕博客</title>
-    <updated>2022-05-15T11:03:32.582Z</updated>
+    <updated>2022-05-20T04:48:13.844Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <author>
         <name>宝硕</name>
@@ -174,7 +174,7 @@ tar cz ca account.conf | <span class="hljs-built_in">base64</span> -w0</code></p
         <span class="hljs-attr">script:</span> <span class="hljs-string">|</span>
           <span class="hljs-string">sudo</span> <span class="hljs-string">/opt/hooks/reload-nginx.sh</span></code></pre><p>需要注意的是，重载 Nginx / Apache 的命令需要 root 权限才能执行，可以采用只允许部署用户以 root 权限执行重载脚本的方式来避免出现安全问题。</p><p>在 <code>/opt/hooks</code> 目录下新建一个文件 <code>reload-nginx.sh</code>，内容如下：</p><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span>
 sudo systemctl force-reload nginx</code></pre><p>然后新建一个名为 <code>actions-cert</code> 的用户，然后在 <code>/etc/sudoers</code> 文件中添加以下内容：</p><pre><code class="hljs arcade">actions-cert <span class="hljs-built_in">ALL</span>=(<span class="hljs-built_in">ALL</span>) NOPASSWD: <span class="hljs-regexp">/opt/</span>hooks/reload-nginx.sh</code></pre><p>这个配置可以使 <code>actions-cert</code> 用户免密码以 root 用户的权限执行 <code>/opt/hooks/reload-nginx.sh</code>。</p><p>最后使用 <code>chmod 755 /opt/hooks/reload-nginx.sh</code> 命令将 <code>reload-nginx.sh</code> 文件设置为可执行，同时禁止非所有者对其进行写入操作。</p><p>如果服务器位于 NAT 后，或者禁止了 SSH 连接，还有两个方法可以将证书部署到内网服务器上：</p><ol><li>将证书先部署到有部署条件的服务器上，然后再在内网服务器上使用 rsync 从部署好的服务器上拉取证书。</li><li>将证书上传到 <a href="https://azure.microsoft.com/en-us/services/key-vault/" rel="external nofollow noreferrer">Azure Key Vault</a> 等托管服务中，再在服务器上按照 <a href="https://blog.men.ci/ssl-with-github-actions/#%E6%9C%8D%E5%8A%A1%E5%99%A8" rel="external nofollow noreferrer">Menci 的文章</a> 中的教程拉取即可。</li></ol><h3 id="阿里云">阿里云</h3><p>阿里云的 <a href="https://www.aliyun.com/product/cas" rel="external nofollow noreferrer">SSL 证书服务</a> 支持上传自定义证书，该证书可以用于 <a href="https://www.aliyun.com/product/cdn" rel="external nofollow noreferrer">阿里云 CDN</a>。阿里云暂未提供将证书部署至 OSS 的 API，建议 OSS 用户使用 CDN 回源 OSS 来代替。</p><p>使用 <a href="https://github.com/Menci/deploy-certificate-to-aliyun" rel="external nofollow noreferrer">Menci/deploy-certificate-to-aliyun</a> 将证书部署到阿里云：</p><pre><code class="hljs yaml"><span class="hljs-comment"># 部署到阿里云</span>
-<span class="hljs-attr">deploy-to-server:</span>
+<span class="hljs-attr">deploy-to-aliyun:</span>
   <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">Certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">Aliyun</span>
   <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
   <span class="hljs-attr">needs:</span> <span class="hljs-string">issue-ssl-certificate</span>
@@ -197,7 +197,34 @@ sudo systemctl force-reload nginx</code></pre><p>然后新建一个名为 <code>
         <span class="hljs-attr">certificate-name:</span> <span class="hljs-string">example.com</span>
         <span class="hljs-attr">cdn-domains:</span> <span class="hljs-string">|</span>
 <span class="hljs-string">          example.com</span>
-<span class="hljs-string">          example.net</span></code></pre><p>其中 <code>certificate-name</code> 指定上传的证书在证书服务中的名称（将自动替换旧版本），<code>cdn-domain</code> 指定需要将该证书部署到的 CDN 域名列表（用空白字符隔开）。</p><p>建议使用子账户 Access Key，为其赋予以下权限（并按需使用资源组隔离）：</p><ul><li>AliyunYundunCertFullAccess</li><li>AliyunCDNFullAccess</li><li>AliyunPCDNFullAccess</li><li>AliyunSCDNFullAccess</li><li>AliyunDCDNFullAccess</li></ul><h2 id="完整例子">完整例子</h2><p>这个 Action 完成了以下操作：</p><ol><li>申请证书，并上传到仓库的 <code>certs</code> 分支。</li><li>在申请证书后将 <code>certs</code> 分支中的证书部署到服务器上。</li></ol><pre><code class="hljs yaml"><span class="hljs-comment"># 名称</span>
+<span class="hljs-string">          example.net</span></code></pre><p>其中 <code>certificate-name</code> 指定上传的证书在证书服务中的名称（将自动替换旧版本），<code>cdn-domains</code> 指定需要将该证书部署到的 CDN 域名列表（用空白字符隔开）。</p><p>建议使用子账户 Access Key，为其赋予以下权限（并按需使用资源组隔离）：</p><ul><li>AliyunYundunCertFullAccess</li><li>AliyunCDNFullAccess</li><li>AliyunPCDNFullAccess</li><li>AliyunSCDNFullAccess</li><li>AliyunDCDNFullAccess</li></ul><h3 id="腾讯云">腾讯云</h3><p>使用 <a href="https://github.com/renbaoshuo/deploy-certificate-to-tencentcloud" rel="external nofollow noreferrer">renbaoshuo/deploy-certificate-to-tencentcloud</a> 将证书部署至腾讯云 CDN：</p><pre><code class="hljs yaml"><span class="hljs-attr">deploy-to-qcloud-cdn:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">Tencent</span> <span class="hljs-string">Cloud</span> <span class="hljs-string">CDN</span>
+  <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+  <span class="hljs-attr">needs:</span> <span class="hljs-string">issue-ssl-certificate</span>
+
+  <span class="hljs-attr">steps:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Check</span> <span class="hljs-string">out</span>
+      <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
+      <span class="hljs-attr">with:</span>
+        <span class="hljs-comment"># If you just commited and pushed your newly issued certificate to this repo in a previous job,</span>
+        <span class="hljs-comment"># use `ref` to make sure checking out the newest commit in this job</span>
+        <span class="hljs-attr">ref:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">github.ref</span> <span class="hljs-string">&#125;&#125;</span>
+
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">renbaoshuo/deploy-certificate-to-tencentcloud@beta-v1</span>
+      <span class="hljs-attr">with:</span>
+        <span class="hljs-comment"># Use Access Key</span>
+        <span class="hljs-attr">secret-id:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.QCLOUD_SECRET_ID</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-attr">secret-key:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.QCLOUD_SECRET_KEY</span> <span class="hljs-string">&#125;&#125;</span>
+
+        <span class="hljs-comment"># Specify PEM fullchain file</span>
+        <span class="hljs-attr">fullchain-file:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.FILE_FULLCHAIN</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-comment"># Specify PEM private key file</span>
+        <span class="hljs-attr">key-file:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.CERTS_OUTPUT_DIRECTORY</span> <span class="hljs-string">&#125;&#125;/$&#123;&#123;</span> <span class="hljs-string">env.FILE_KEY</span> <span class="hljs-string">&#125;&#125;</span>
+
+        <span class="hljs-comment"># Deploy to CDN</span>
+        <span class="hljs-attr">cdn-domains:</span> <span class="hljs-string">|</span>
+<span class="hljs-string">          cdn1.example.com</span>
+<span class="hljs-string">          cdn2.example.com</span></code></pre><p>其中 <code>cdn-domains</code> 指定需要将该证书部署到的 CDN 域名列表（用空白字符隔开）。</p><p>建议使用子账户 API 密钥，为其赋予以下权限（并按需使用资源组隔离）：</p><ul><li>QcloudCDNFullAccess</li></ul><h2 id="完整例子">完整例子</h2><p>这个 Action 完成了以下操作：</p><ol><li>申请证书，并上传到仓库的 <code>certs</code> 分支。</li><li>在申请证书后将 <code>certs</code> 分支中的证书部署到服务器上。</li></ol><pre><code class="hljs yaml"><span class="hljs-comment"># 名称</span>
 <span class="hljs-attr">name:</span> <span class="hljs-string">Issue</span> <span class="hljs-string">SSL</span> <span class="hljs-string">Certificates</span>
 
 <span class="hljs-comment"># 触发条件</span>
