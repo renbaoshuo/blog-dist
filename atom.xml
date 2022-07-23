@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://blog.baoshuo.ren</id>
     <title>宝硕博客</title>
-    <updated>2022-07-23T14:05:50.576Z</updated>
+    <updated>2022-07-23T23:11:42.361Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <author>
         <name>宝硕</name>
@@ -33,18 +33,16 @@
   <span class="hljs-attribute">padding</span>: <span class="hljs-number">1rem</span>;
 &#125;</code></pre><p>可以看到这份文件中包括了许多的无用代码，比如重复的 <code>content: var(--tw-content)</code>。</p><h3 id="更小的构建产物">更小的构建产物</h3><p>传统的 CSS 编写方法无法复用组件间重复的 CSS 规则，比如下图中高亮的几条规则各自躺在它们对应的 CSS 类中：</p><p><img src="https://arina.loli.net/2022/07/23/TKvwu6PpgxalrsG.png" alt="" loading="lazy"></p><p>这样会导致 CSS 产物大小与项目的复杂程度和组件数量线性正相关。</p><p>但使用 Atomic CSS 之后，这些规则被提取出来进行复用：</p><p><img src="https://arina.loli.net/2022/07/23/xKRoETDVqQBgFcf.png" alt="" loading="lazy"></p><p>随着后期组件数量逐渐增加、能复用的 CSS 规则越来越多、最终 CSS 产物大小与项目复杂程度呈对数关系：</p><p><img src="https://s1.baoshuo.ren/2022/07/16/Uq6nbJXidShyzH8.png" alt="" loading="lazy"></p><p>Facebook 分享了他们的数据：在旧网站上，仅登录页就需要加载 413 KiB 的样式文件，而在使用 Atomic CSS-in-JS 重写后，整个站点只有 74 KiB 的样式文件，还包括了深色模式。</p><p>虽然在使用 Atomic CSS 之后，HTML 的体积会显著增大，不过由于这些类名的高冗余度，可以利用 gzip 来压缩掉很大一部分体积。</p><h3 id="处理-css-规则的插入顺序">处理 CSS 规则的插入顺序</h3><p>让我们再来回顾一遍这个经典的 CSS 规则插入顺序的问题：</p><p><img src="https://s1.baoshuo.ren/2022/07/23/dfu1NqZ7i3pmOrM.png" alt="" loading="lazy"></p><p>我们都知道，最后生效的样式不是最后一个类名对应的规则，而是样式表中最后插入的规则。</p><p>那么，如何在 CSS-in-JS 中处理这个问题呢？通用的做法是在生成阶段就将冲突的规则过滤掉，以避免产生冲突。比如下面这个组件：</p><pre><code class="hljs js"><span class="hljs-keyword">const</span> styles = style9.<span class="hljs-title function_">create</span>(&#123;
   <span class="hljs-attr">card</span>: &#123;
-    <span class="hljs-attr">marginTop</span>: <span class="hljs-string">&#x27;10px&#x27;</span>,
-    <span class="hljs-attr">marginBottom</span>: <span class="hljs-string">&#x27;10px&#x27;</span>,
+    <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;#000000&#x27;</span>,
   &#125;,
   <span class="hljs-attr">profileCard</span>: &#123;
-    <span class="hljs-attr">marginBottom</span>: <span class="hljs-string">&#x27;20px&#x27;</span>,
+    <span class="hljs-attr">color</span>: <span class="hljs-string">&#x27;#ffffff&#x27;</span>,
   &#125;,
 &#125;);
 
 <span class="hljs-keyword">const</span> <span class="hljs-title function_">Component</span> = (<span class="hljs-params"></span>) =&gt; (
   <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&#123;style9(styles.card,</span> <span class="hljs-attr">styles.profileCard</span>)&#125; /&gt;</span></span>
-);</code></pre><p>过滤后组件的实际样式如下：</p><pre><code class="hljs css"><span class="hljs-attribute">margin-top</span>: <span class="hljs-number">10px</span>;
-<span class="hljs-attribute">margin-bottom</span>: <span class="hljs-number">20px</span>;</code></pre><p>但 CSS 中有一些简写规则，如果只按照规则名称来处理显然是不行的。有的库强制开发者们不使用简写规则来避免这个问题，而另外的一些库则将这些简写规则展开成多条规则后再进行过滤，比如 <code>margin: 10px</code> 可以被拆成 <code>margin-top: 10px</code>、<code>margin-right: 10px</code>、<code>margin-bottom: 10px</code>、<code>margin-left: 10px</code> 四条独立的规则。</p><h3 id="经典实现">经典实现</h3><p>Atomic CSS-in-JS 实现有运行时（Runtime）和预编译（Pre-Compile）两种。运行时（Runtime）的优点在于可以动态生成样式，相比于下文中采用预编译方法的库来说灵活度高了不止一点半点。其缺点则在于 Vendor Prefix 等操作需要在 Runtime 执行，因此 Bundle 中必须携带相关依赖导致体积增大。预编译（Pre-Compile）的优点则在于无需将相关依赖打包发送给客户端，改善了性能。而缺点则是预编译的过程高度依赖静态代码分析，所以难以实现动态样式生成与组合。</p><h4 id="styletron">Styletron</h4><p><a href="https://styletron.org" rel="external nofollow noreferrer">Styletron</a> 是 Uber 公司开发的一个较为典型的运行时 Atomic CSS-in-JS 库，驱动了 Uber 的官网和 H5 页面。</p><p>Styletron 还提供了一套 Styled Components 的实现，可以通过下面的方式使用：</p><pre><code class="hljs javascript"><span class="hljs-keyword">import</span> &#123; styled &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;styletron-react&#x27;</span>;
+);</code></pre><p>过滤后组件的实际样式如下：</p><pre><code class="hljs css"><span class="hljs-attribute">color</span>: <span class="hljs-number">#ffffff</span>;</code></pre><p>而如果将组件样式中的 <code>styles.card</code> 和 <code>styles.profileCard</code> 调换一下顺序，过滤之后的样式就变成了这样：</p><pre><code class="hljs css"><span class="hljs-attribute">color</span>: <span class="hljs-number">#000000</span>;</code></pre><p>但 CSS 中有一些简写规则，如果只按照规则名称来处理显然是不行的。有的库强制开发者们不使用简写规则来避免这个问题，而另外的一些库则将这些简写规则展开成多条规则后再进行过滤，比如 <code>margin: 10px</code> 可以被拆成 <code>margin-top: 10px</code>、<code>margin-right: 10px</code>、<code>margin-bottom: 10px</code>、<code>margin-left: 10px</code> 四条独立的规则。</p><h3 id="经典实现">经典实现</h3><p>Atomic CSS-in-JS 实现有运行时（Runtime）和预编译（Pre-Compile）两种。运行时（Runtime）的优点在于可以动态生成样式，相比于下文中采用预编译方法的库来说灵活度高了不止一点半点。其缺点则在于 Vendor Prefix 等操作需要在 Runtime 执行，因此 Bundle 中必须携带相关依赖导致体积增大。预编译（Pre-Compile）的优点则在于无需将相关依赖打包发送给客户端，改善了性能。而缺点则是预编译的过程高度依赖静态代码分析，所以难以实现动态样式生成与组合。</p><h4 id="styletron">Styletron</h4><p><a href="https://styletron.org" rel="external nofollow noreferrer">Styletron</a> 是 Uber 公司开发的一个较为典型的运行时 Atomic CSS-in-JS 库，驱动了 Uber 的官网和 H5 页面。</p><p>Styletron 还提供了一套 Styled Components 的实现，可以通过下面的方式使用：</p><pre><code class="hljs javascript"><span class="hljs-keyword">import</span> &#123; styled &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;styletron-react&#x27;</span>;
 
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">Component</span> = <span class="hljs-title function_">styled</span>(<span class="hljs-string">&#x27;div&#x27;</span>, &#123;
   <span class="hljs-attr">marginTop</span>: <span class="hljs-string">&#x27;10px&#x27;</span>,
