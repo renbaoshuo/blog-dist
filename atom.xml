@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://blog.baoshuo.ren</id>
     <title>宝硕博客</title>
-    <updated>2022-12-12T12:57:03.165Z</updated>
+    <updated>2022-12-12T14:21:45.549Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <author>
         <name>宝硕</name>
@@ -571,7 +571,7 @@ tar cz ca account.conf | <span class="hljs-built_in">base64</span> -w0</code></p
     <span class="hljs-attr">name:</span> <span class="hljs-string">Issue</span> <span class="hljs-string">SSL</span> <span class="hljs-string">certificate</span>
     <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
     <span class="hljs-attr">steps:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">Menci/acme@v1</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">Menci/acme@v2</span>
         <span class="hljs-attr">with:</span>
           <span class="hljs-comment"># 指定 acme.sh 的版本</span>
           <span class="hljs-attr">version:</span> <span class="hljs-number">3.0</span><span class="hljs-number">.2</span>
@@ -727,7 +727,7 @@ sudo systemctl force-reload nginx</code></pre><p>然后新建一个名为 <code>
 
     <span class="hljs-comment"># 上传证书</span>
     <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">aliyun</span>
-      <span class="hljs-attr">uses:</span> <span class="hljs-string">Menci/deploy-certificate-to-aliyun@latest</span>
+      <span class="hljs-attr">uses:</span> <span class="hljs-string">Menci/deploy-certificate-to-aliyun@beta-v1</span>
       <span class="hljs-attr">with:</span>
         <span class="hljs-attr">access-key-id:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.ALIYUN_ACCESS_KEY_ID</span> <span class="hljs-string">&#125;&#125;</span>
         <span class="hljs-attr">access-key-secret:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.ALIYUN_ACCESS_KEY_SECRET</span> <span class="hljs-string">&#125;&#125;</span>
@@ -749,7 +749,7 @@ sudo systemctl force-reload nginx</code></pre><p>然后新建一个名为 <code>
         <span class="hljs-comment"># use `ref` to make sure checking out the newest commit in this job</span>
         <span class="hljs-attr">ref:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">github.ref</span> <span class="hljs-string">&#125;&#125;</span>
 
-    <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">renbaoshuo/deploy-certificate-to-tencentcloud@latest</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">renbaoshuo/deploy-certificate-to-tencentcloud@v1</span>
       <span class="hljs-attr">with:</span>
         <span class="hljs-comment"># Use Access Key</span>
         <span class="hljs-attr">secret-id:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.QCLOUD_SECRET_ID</span> <span class="hljs-string">&#125;&#125;</span>
@@ -774,7 +774,7 @@ sudo systemctl force-reload nginx</code></pre><p>然后新建一个名为 <code>
           <span class="hljs-comment"># If you just commited and pushed your newly issued certificate to this repo in a previous job,</span>
           <span class="hljs-comment"># use `ref` to make sure checking out the newest commit in this job</span>
           <span class="hljs-attr">ref:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">github.ref</span> <span class="hljs-string">&#125;&#125;</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">renbaoshuo/deploy-certificate-to-goedge@latest</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">renbaoshuo/deploy-certificate-to-goedge@beta-v1</span>
         <span class="hljs-attr">with:</span>
           <span class="hljs-comment"># GoEdge API endpoint</span>
           <span class="hljs-attr">api-endpoint:</span> <span class="hljs-string">https://cdn.api.baoshuo.dev</span>
