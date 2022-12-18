@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://blog.baoshuo.ren</id>
     <title>宝硕博客</title>
-    <updated>2022-12-12T14:21:45.549Z</updated>
+    <updated>2022-12-18T08:31:01.171Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <author>
         <name>宝硕</name>
@@ -763,34 +763,33 @@ sudo systemctl force-reload nginx</code></pre><p>然后新建一个名为 <code>
         <span class="hljs-comment"># Deploy to CDN</span>
         <span class="hljs-attr">cdn-domains:</span> <span class="hljs-string">|</span>
 <span class="hljs-string">          cdn1.example.com</span>
-<span class="hljs-string">          cdn2.example.com</span></code></pre><p>其中 <code>cdn-domains</code> 指定需要将该证书部署到的 CDN 域名列表（用空白字符隔开）。</p><p>建议使用子账户 API 密钥，为其赋予以下权限（并按需使用资源组隔离）：</p><ul><li>QcloudCDNFullAccess</li></ul><h3 id="自建-goedge-cdn">自建 GoEdge CDN</h3><p>使用 <a href="https://github.com/renbaoshuo/deploy-certificate-to-goedge" rel="external nofollow noreferrer"><code>renbaoshuo/deploy-certificate-to-goedge</code></a> 将证书部署至自建的 GoEdge CDN：</p><pre><code class="hljs yaml"><span class="hljs-attr">jobs:</span>
-  <span class="hljs-attr">deploy-to-goedge-cdn:</span>
-    <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">GoEdge</span> <span class="hljs-string">CDN</span>
-    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
-    <span class="hljs-attr">steps:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Check</span> <span class="hljs-string">out</span>
-        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
-        <span class="hljs-attr">with:</span>
-          <span class="hljs-comment"># If you just commited and pushed your newly issued certificate to this repo in a previous job,</span>
-          <span class="hljs-comment"># use `ref` to make sure checking out the newest commit in this job</span>
-          <span class="hljs-attr">ref:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">github.ref</span> <span class="hljs-string">&#125;&#125;</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">renbaoshuo/deploy-certificate-to-goedge@beta-v1</span>
-        <span class="hljs-attr">with:</span>
-          <span class="hljs-comment"># GoEdge API endpoint</span>
-          <span class="hljs-attr">api-endpoint:</span> <span class="hljs-string">https://cdn.api.baoshuo.dev</span>
+<span class="hljs-string">          cdn2.example.com</span></code></pre><p>其中 <code>cdn-domains</code> 指定需要将该证书部署到的 CDN 域名列表（用空白字符隔开）。</p><p>建议使用子账户 API 密钥，为其赋予以下权限（并按需使用资源组隔离）：</p><ul><li>QcloudCDNFullAccess</li></ul><h3 id="自建-goedge-cdn">自建 GoEdge CDN</h3><p>使用 <a href="https://github.com/renbaoshuo/deploy-certificate-to-goedge" rel="external nofollow noreferrer"><code>renbaoshuo/deploy-certificate-to-goedge</code></a> 将证书部署至自建的 GoEdge CDN：</p><pre><code class="hljs yaml"><span class="hljs-attr">deploy-to-goedge-cdn:</span>
+  <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">certificate</span> <span class="hljs-string">to</span> <span class="hljs-string">GoEdge</span> <span class="hljs-string">CDN</span>
+  <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+  <span class="hljs-attr">steps:</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Check</span> <span class="hljs-string">out</span>
+      <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v2</span>
+      <span class="hljs-attr">with:</span>
+        <span class="hljs-comment"># If you just commited and pushed your newly issued certificate to this repo in a previous job,</span>
+        <span class="hljs-comment"># use `ref` to make sure checking out the newest commit in this job</span>
+        <span class="hljs-attr">ref:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">github.ref</span> <span class="hljs-string">&#125;&#125;</span>
+    <span class="hljs-bullet">-</span> <span class="hljs-attr">uses:</span> <span class="hljs-string">renbaoshuo/deploy-certificate-to-goedge@beta-v1</span>
+      <span class="hljs-attr">with:</span>
+        <span class="hljs-comment"># GoEdge API endpoint</span>
+        <span class="hljs-attr">api-endpoint:</span> <span class="hljs-string">https://cdn.api.baoshuo.dev</span>
 
-          <span class="hljs-comment"># Use Access Key</span>
-          <span class="hljs-attr">access-key-type:</span> <span class="hljs-string">user</span>
-          <span class="hljs-attr">access-key-id:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.GOEDGE_ACCESS_KEY_ID</span> <span class="hljs-string">&#125;&#125;</span>
-          <span class="hljs-attr">access-key:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.GOEDGE_ACCESS_KEY</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-comment"># Use Access Key</span>
+        <span class="hljs-attr">access-key-type:</span> <span class="hljs-string">user</span>
+        <span class="hljs-attr">access-key-id:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.GOEDGE_ACCESS_KEY_ID</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-attr">access-key:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.GOEDGE_ACCESS_KEY</span> <span class="hljs-string">&#125;&#125;</span>
 
-          <span class="hljs-comment"># GoEdge certificate ID</span>
-          <span class="hljs-attr">cert-id:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.GOEDGE_CERT_ID</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-comment"># GoEdge certificate ID</span>
+        <span class="hljs-attr">cert-id:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">secrets.GOEDGE_CERT_ID</span> <span class="hljs-string">&#125;&#125;</span>
 
-          <span class="hljs-comment"># Specify PEM fullchain file</span>
-          <span class="hljs-attr">fullchain-file:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.FILE_FULLCHAIN</span> <span class="hljs-string">&#125;&#125;</span>
-          <span class="hljs-comment"># Specify PEM private key file</span>
-          <span class="hljs-attr">key-file:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.FILE_KEY</span> <span class="hljs-string">&#125;&#125;</span></code></pre><p><em>注：在部署前需要手动上传一次证书以便获取证书 ID。证书 ID 可以在「证书文件下载」处的 URL 参数中找到。</em></p><h2 id="完整例子">完整例子</h2><p>这个 Action 完成了以下操作：</p><ol><li>申请证书，并上传到仓库的 <code>certs</code> 分支。</li><li>在申请证书后将 <code>certs</code> 分支中的证书部署到服务器上。</li></ol><pre><code class="hljs yaml"><span class="hljs-comment"># 名称</span>
+        <span class="hljs-comment"># Specify PEM fullchain file</span>
+        <span class="hljs-attr">fullchain-file:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.FILE_FULLCHAIN</span> <span class="hljs-string">&#125;&#125;</span>
+        <span class="hljs-comment"># Specify PEM private key file</span>
+        <span class="hljs-attr">key-file:</span> <span class="hljs-string">$&#123;&#123;</span> <span class="hljs-string">env.FILE_KEY</span> <span class="hljs-string">&#125;&#125;</span></code></pre><p><em>注：在部署前需要手动上传一次证书以便获取证书 ID。证书 ID 可以在「证书文件下载」处的 URL 参数中找到。</em></p><h2 id="完整例子">完整例子</h2><p>这个 Action 完成了以下操作：</p><ol><li>申请证书，并上传到仓库的 <code>certs</code> 分支。</li><li>在申请证书后将 <code>certs</code> 分支中的证书部署到服务器上。</li></ol><pre><code class="hljs yaml"><span class="hljs-comment"># 名称</span>
 <span class="hljs-attr">name:</span> <span class="hljs-string">Issue</span> <span class="hljs-string">SSL</span> <span class="hljs-string">Certificates</span>
 
 <span class="hljs-comment"># 触发条件</span>
