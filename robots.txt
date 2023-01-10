@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://blog.baoshuo.ren
+
+# Sitemaps
+Sitemap: https://blog.baoshuo.ren/sitemap.xml
