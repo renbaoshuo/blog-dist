@@ -2,13 +2,25 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://blog.baoshuo.ren</id>
     <title>宝硕博客</title>
-    <updated>2023-01-10T11:22:50.409Z</updated>
+    <updated>2023-02-08T02:26:15.718Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <author>
         <name>宝硕</name>
         <uri>https://baoshuo.ren</uri>
     </author>
     <link rel="alternate" href="https://blog.baoshuo.ren"/>
+    <entry>
+        <title type="html"><![CDATA[向 #Define Int Long Long 说不]]></title>
+        <id>https://blog.baoshuo.ren/post/say-no-to-define-int-long-long/</id>
+        <link href="https://blog.baoshuo.ren/post/say-no-to-define-int-long-long/"/>
+        <updated>2023-02-08T01:21:05.000Z</updated>
+        <summary type="html"><![CDATA[在算法竞赛社区中，经常能看见有人在代码中使用 #define int long long 来偷懒。这种做法会导致代码的可读性大大降低，并带来一些难以预料的问题。本文将从 C++ 标准定义的角度，解释为什么这种做法是不可取的。]]></summary>
+        <content type="html"><![CDATA[<h2 id="tl-dr">TL;DR</h2><p><code>#define int long long</code> 是一种未定义行为，尽量不要在代码中使用它。</p><h2 id="前言">前言</h2><p>在算法竞赛社区中，经常能看见有人在代码中使用 #define int long long 来偷懒。我是一直极力反对这种做法的，因为这种做法会导致代码的可读性大大降低，并带来一些难以预料的问题。</p><h2 id="c-标准">C++ 标准</h2><p>在 ISO/IEC 14882:2014(E) 的 17.6.4.3.1 Macro names 一节中，有这样一段描述：</p><p><img src="https://arina.loli.net/2023/01/30/yxkIGujSCKBeRlt.png" alt="" loading="lazy"></p><p>翻译并整理一下，就是：</p><blockquote><p>翻译单元不可 <code>#define</code> 或 <code>#undef</code> 词法上等同于下列部分的名称：</p><ul><li><p>C++ 中的关键字（表 4、表 5，在 2.12 节 Keywords <code>[lex.key]</code> 中给出）；</p><p><img src="https://arina.loli.net/2023/01/30/7Q9nONJElzkMdFh.png" alt="" loading="lazy"></p></li><li><p>有特殊含义的标识符（表 3，在 2.11 节 Identifiers <code>[lex.name]</code> 中给出）；</p><p><img src="https://arina.loli.net/2023/01/30/xma8Bt2JybCAl6T.png" alt="" loading="lazy"></p></li><li><p>任何标准属性记号（attribute-token，在 7.6 节 Attributes <code>[dcl.attr]</code> 中给出）。</p></li></ul></blockquote><p>也就是说，标准中 <strong>并不允许 <code>#define int</code></strong> 这种操作。</p><h2 id="编译器实现">编译器实现</h2><h3 id="gcc">GCC</h3><p>在 GCC 的 <a href="https://gcc.gnu.org/onlinedocs/cpp/Macros.html" rel="external nofollow noreferrer">C Preprocessor 文档中</a> 给出了下面的说明：</p><blockquote><p>You may define any valid identifier as a macro, even if it is a C keyword.</p></blockquote><p>也就是说，GCC 并没有严格按照标准来实现预处理器，而是稍微放宽了一些限制以允许通过这种方式来使得代码更加灵活，便于增强代码的向下兼容性。</p><h3 id="clang">Clang</h3><p>相关文档中并未提及是否允许 define 关键字，但源代码中未见相关限制。</p><h3 id="msvc">MSVC</h3><p><a href="https://learn.microsoft.com/en-us/cpp/preprocessor/hash-define-directive-c-cpp" rel="external nofollow noreferrer"><code>#define</code> 指令</a> 相关文档中并未提及。</p><h2 id="后记">后记</h2><p>使用适当的数据类型来存储数据，有利于代码的可读性和稳定性，便于编写和调试。同时，正确设置变量类型也能提高程序的运行速度和效率。因此，我们应该做好正确的数据类型定义，而不是在编写代码时滥用 <code>#define int long long</code>。</p>]]></content>
+        <author>
+            <name>宝硕</name>
+            <uri>https://baoshuo.ren</uri>
+        </author>
+    </entry>
     <entry>
         <title type="html"><![CDATA[再见，2022 —— 我的 2022 年度总结]]></title>
         <id>https://blog.baoshuo.ren/post/goodbye-2022/</id>
@@ -1151,78 +1163,6 @@ xhr.<span class="hljs-title function_">send</span>();</code></pre><p>使用 fetc
 <span class="hljs-attr">AllowedIPs</span> = <span class="hljs-number">0.0</span>.<span class="hljs-number">0.0</span>/<span class="hljs-number">0</span>
 <span class="hljs-attr">AllowedIPs</span> = ::/<span class="hljs-number">0</span>
 <span class="hljs-attr">Endpoint</span> = engage.cloudflareclient.com:<span class="hljs-number">2408</span></code></pre><ul><li>添加 IPv4 网络访问<ol><li>删去 <code>[Interface]</code> 中的 <code>Address = fd01:******/128</code> ；</li><li>删去 <code>[Peer]</code> 中的 <code>AllowedIPs = ::/0</code> ；</li><li>将 Endpoint 的域名替换为解析出来的 IPv6 地址，如 <code>[2606:4700:d0::a29f:c001]:2408</code> 。</li></ol></li><li>添加 IPv6 网络访问<ol><li>删去 <code>[Interface]</code> 中的 <code>Address = 172.16.*.*/32</code> ；</li><li>删去 <code>[Peer]</code> 中的 <code>AllowedIPs = 0.0.0.0/0</code> ；</li><li>将 Endpoint 的域名替换为解析出来的 IPv4 地址，如 <code>162.159.192.1:2408</code> 。</li></ol></li></ul><p>如果不需要使用 Cloudflare 的 DNS 服务可以删去 <code>DNS = 1.1.1.1</code> 这一行，使用的话需要安装 <code>resolvconf</code> 。</p><h2 id="启动-wireguard-隧道">启动 WireGuard 隧道</h2><p>将刚才修改好的配置文件移动到 <code>/etc/wireguard/</code> 目录下，推荐命名为 <code>wgcf.conf</code> ，下面的操作以这个文件名为准。</p><p>使用 <code>systemd enable --now wg-quick@wgcf</code> 命令启动隧道，然后使用 <code>wg show wgcf</code> 命令查看隧道状态。</p><p>如果在启动时出现了错误，可以使用 <code>systemd status wg-quick@wgcf</code> 命令查看错误信息，修复后使用 <code>systemd start wg-quick@wgcf</code> 启动隧道。</p><p><img src="https://s1.baoshuo.ren/2021/07/15/M9D1L2rFfHCPtcU.png" alt="" loading="lazy"></p><p>之后就可以享受双栈网络带来的便利了~</p><p>注：日常如果需要重启隧道可以使用 <code>systemctl restart wg-quick@wgcf</code> 命令。</p><h2 id="后记">后记</h2><p>折腾这些的原因是我从某个 Player IX 那里嫖的 VM 没有提供 IPv4 网络访问权限，这让我日常的维护工作麻烦了很多，于是我想到了 Cloudflare Warp 这个东西。CloudFlare Warp 提供的网络访问相较于 <a href="http://TunnelBroker.net" rel="external nofollow noreferrer">TunnelBroker.net</a> 、 <a href="http://TunnelBroker.ch" rel="external nofollow noreferrer">TunnelBroker.ch</a> 等一众隧道要好很多，延迟并不像其他隧道那样高。</p><p>在查找资料的过程中我也发现了很多博客里面所描述的内容有误或已经过时，所以综合其他文章的内容加上自己的实践，写下了这篇文章。</p><h2 id="参考资料">参考资料</h2><ol><li><a href="https://luotianyi.vc/5252.html" rel="external nofollow noreferrer">【WGCF】连接 CF WARP 为服务器添加 IPv4/IPv6 网络 - Luminous’ Home</a></li><li><a href="https://p3terx.com/archives/use-cloudflare-warp-to-add-extra-ipv4-or-ipv6-network-support-to-vps-servers-for-free.html" rel="external nofollow noreferrer">Cloudflare WARP 给 VPS 服务器额外添加 IPv4 或 IPv6 网络获得“原生”IP - P3TERX</a></li></ol>]]></content>
-        <author>
-            <name>宝硕</name>
-            <uri>https://baoshuo.ren</uri>
-        </author>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[搭建 BIRD Looking Glass 速成指北]]></title>
-        <id>https://blog.baoshuo.ren/post/bird-looking-glass/</id>
-        <link href="https://blog.baoshuo.ren/post/bird-looking-glass/"/>
-        <updated>2021-05-03T04:23:00.000Z</updated>
-        <summary type="html"><![CDATA[BIRD 是 Linux 上常用的一款 BGP 路由软件。bird-lg-go 是 蓝天 使用 Go 语言编写的 Looking Glass 程序，内存占用比原版 bird-lg 更低。它提供了一个网页面板，可以显示各个服务器上的 BIRD 路由软件的状态，以及查询到指定 IP 的路由。]]></summary>
-        <content type="html"><![CDATA[<p>BIRD 是 Linux 上常用的一款 BGP 路由软件。bird-lg-go 是 <a href="https://lantian.pub" rel="external nofollow noreferrer">蓝天</a> 使用 Go 语言编写的 Looking Glass 程序，内存占用比原版 bird-lg 更低。它提供了一个网页面板，可以显示各个服务器上的 BIRD 路由软件的状态，以及查询到指定 IP 的路由。</p><span id="more"></span><ul><li>项目地址：<a href="https://github.com/xddxdd/bird-lg-go" rel="external nofollow noreferrer">https://github.com/xddxdd/bird-lg-go</a></li><li>成品： <a href="https://lg.dn42.as141776.net" rel="external nofollow noreferrer">https://lg.dn42.as141776.net</a></li></ul><h2 id="安装-docker-和-docker-compose">安装 Docker 和 Docker Compose</h2><p>虽然这个程序可以直接运行，但我还是比较喜欢套个 Docker 防止污染环境。</p><pre><code class="hljs bash">curl -sSL https://get.docker.com | sh
-pip install docker-compose</code></pre><h2 id="编排-docker-compose-服务">编排 Docker Compose 服务</h2><p>在运行 web 的服务器上找个地方（如 <code>/var/bird-lg/</code>），将下面的内容修改后写入 <code>docker-compose.yml</code> 中：</p><pre><code class="hljs yml"><span class="hljs-attr">version:</span> <span class="hljs-string">&#x27;3&#x27;</span>
-
-<span class="hljs-attr">services:</span>
-  <span class="hljs-attr">bird-lg:</span>
-    <span class="hljs-attr">image:</span> <span class="hljs-string">xddxdd/bird-lg-go</span>
-    <span class="hljs-attr">container_name:</span> <span class="hljs-string">bird-lg</span>
-    <span class="hljs-attr">restart:</span> <span class="hljs-string">always</span>
-    <span class="hljs-attr">environment:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">BIRDLG_SERVERS=cn1,eu1</span> <span class="hljs-comment"># 节点列表，以逗号分隔</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">BIRDLG_DOMAIN=dn42.as141776.net</span> <span class="hljs-comment"># 节点 endpiont 后缀</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">BIRDLG_TITLE_BRAND=Looking</span> <span class="hljs-string">Glass</span> <span class="hljs-comment"># 标签栏上显示的名称</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">BIRDLG_NAVBAR_BRAND=Looking</span> <span class="hljs-string">Glass</span> <span class="hljs-comment"># 页面上显示的名称</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">BIRDLG_WHOIS=whois.lantian.dn42</span> <span class="hljs-comment"># Whois 服务器地址</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">BIRDLG_DNS_INTERFACE=asn.dn42</span>
-    <span class="hljs-attr">ports:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;5000:5000&#x27;</span>
-  <span class="hljs-attr">bird-lgproxy:</span>
-    <span class="hljs-attr">image:</span> <span class="hljs-string">xddxdd/bird-lgproxy-go</span>
-    <span class="hljs-attr">container_name:</span> <span class="hljs-string">bird-lgproxy</span>
-    <span class="hljs-attr">restart:</span> <span class="hljs-string">always</span>
-    <span class="hljs-attr">volumes:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;/var/run/bird/bird.ctl:/var/run/bird/bird.ctl&#x27;</span>
-    <span class="hljs-attr">ports:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;8000:8000&#x27;</span></code></pre><p>在各个节点上只需要写入下面内容即可：</p><pre><code class="hljs yml"><span class="hljs-attr">version:</span> <span class="hljs-string">&#x27;3&#x27;</span>
-
-<span class="hljs-attr">services:</span>
-  <span class="hljs-attr">bird-lgproxy:</span>
-    <span class="hljs-attr">image:</span> <span class="hljs-string">xddxdd/bird-lgproxy-go</span>
-    <span class="hljs-attr">container_name:</span> <span class="hljs-string">bird-lgproxy</span>
-    <span class="hljs-attr">restart:</span> <span class="hljs-string">always</span>
-    <span class="hljs-attr">volumes:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;/var/run/bird/bird.ctl:/var/run/bird/bird.ctl&#x27;</span>
-    <span class="hljs-attr">ports:</span>
-      <span class="hljs-bullet">-</span> <span class="hljs-string">&#x27;8000:8000&#x27;</span></code></pre><p>之后启动 Docker 容器：</p><pre><code class="hljs bash">docker-compose up -d</code></pre><h2 id="使用-nginx-反代页面">使用 nginx 反代页面</h2><p>使用下方的配置启动反向代理即可。</p><pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;
-    <span class="hljs-attribute">listen</span>      *:<span class="hljs-number">80</span>;
-    <span class="hljs-attribute">listen</span>      [::]:<span class="hljs-number">80</span>;
-    <span class="hljs-attribute">server_name</span> lg.dn42.as141776.net;
-
-    <span class="hljs-comment"># reverse proxy</span>
-    <span class="hljs-section">location</span> / &#123;
-        <span class="hljs-attribute">proxy_pass</span>                         http://127.0.0.1:5000;
-        <span class="hljs-attribute">proxy_http_version</span>                 <span class="hljs-number">1</span>.<span class="hljs-number">1</span>;
-        <span class="hljs-attribute">proxy_cache_bypass</span>                 <span class="hljs-variable">$http_upgrade</span>;
-
-        <span class="hljs-comment"># Proxy headers</span>
-        <span class="hljs-attribute">proxy_set_header</span> Upgrade           <span class="hljs-variable">$http_upgrade</span>;
-        <span class="hljs-attribute">proxy_set_header</span> Host              <span class="hljs-variable">$host</span>;
-        <span class="hljs-attribute">proxy_set_header</span> X-Real-IP         <span class="hljs-variable">$remote_addr</span>;
-        <span class="hljs-attribute">proxy_set_header</span> X-Forwarded-For   <span class="hljs-variable">$proxy_add_x_forwarded_for</span>;
-        <span class="hljs-attribute">proxy_set_header</span> X-Forwarded-Proto <span class="hljs-variable">$scheme</span>;
-        <span class="hljs-attribute">proxy_set_header</span> X-Forwarded-Host  <span class="hljs-variable">$host</span>;
-        <span class="hljs-attribute">proxy_set_header</span> X-Forwarded-Port  <span class="hljs-variable">$server_port</span>;
-
-        <span class="hljs-comment"># Proxy timeouts</span>
-        <span class="hljs-attribute">proxy_connect_timeout</span>              <span class="hljs-number">60s</span>;
-        <span class="hljs-attribute">proxy_send_timeout</span>                 <span class="hljs-number">60s</span>;
-        <span class="hljs-attribute">proxy_read_timeout</span>                 <span class="hljs-number">60s</span>;
-    &#125;
-&#125;</code></pre><h2 id="配置-dns-解析">配置 DNS 解析</h2><p>bird-lg-go 的节点 endpiont 生成逻辑是 <code>http://[节点].[endpoint后缀]:8000</code> ，如 <code>http://eu1.dn42.as141776.net:8000</code> ，所以只需要去配置对应的解析。</p><blockquote><p><strong>警告</strong></p><p>建议解析到节点的公网 IP 上，以免 DN42 炸掉时 Looking Glass 也一并炸掉。</p></blockquote><p>配置示例：</p><pre><code class="hljs stylus">eu1<span class="hljs-selector-class">.dn42</span><span class="hljs-selector-class">.as141776</span><span class="hljs-selector-class">.net</span>.  <span class="hljs-number">3600</span>    IN      A       <span class="hljs-number">136.243</span>.<span class="hljs-number">221.96</span>
-cn1<span class="hljs-selector-class">.dn42</span><span class="hljs-selector-class">.as141776</span><span class="hljs-selector-class">.net</span>.  <span class="hljs-number">3600</span>    IN      CNAME   home<span class="hljs-selector-class">.baoshuo</span><span class="hljs-selector-class">.ren</span>.</code></pre><h2 id="成果">成果</h2><p><img src="https://s1.baoshuo.ren/2021/05/03/iaFfTWAhpdZGJ9t.png" alt="" loading="lazy"></p>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
