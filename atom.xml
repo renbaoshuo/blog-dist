@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://blog.baoshuo.ren</id>
     <title>宝硕博客</title>
-    <updated>2023-02-08T02:26:15.718Z</updated>
+    <updated>2023-02-08T02:34:31.802Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <author>
         <name>宝硕</name>
@@ -10,7 +10,7 @@
     </author>
     <link rel="alternate" href="https://blog.baoshuo.ren"/>
     <entry>
-        <title type="html"><![CDATA[向 #Define Int Long Long 说不]]></title>
+        <title type="html"><![CDATA[向 #define int long long 说不]]></title>
         <id>https://blog.baoshuo.ren/post/say-no-to-define-int-long-long/</id>
         <link href="https://blog.baoshuo.ren/post/say-no-to-define-int-long-long/"/>
         <updated>2023-02-08T01:21:05.000Z</updated>
