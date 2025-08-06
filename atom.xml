@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://blog.baoshuo.ren</id>
     <title>宝硕博客</title>
-    <updated>2025-08-05T15:39:24.775Z</updated>
+    <updated>2025-08-06T09:55:16.079Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <author>
         <name>宝硕</name>
@@ -88,7 +88,18 @@ UnicodeRangeToken</code></pre><p>于是乎，我们就有了词法分析的期�
 &#125;
 
 <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(l *Lexer)</span></span> Err() <span class="hljs-type">error</span>
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(l *Lexer)</span></span> Next() (TokenType, []<span class="hljs-type">rune</span>)</code></pre><p>在 <code>Next</code> 方法中有一个巨大的 switch-case 语句，这里面包含了 <a href="https://www.w3.org/TR/2021/CRD-css-syntax-3-20211224/#consume-token" rel="external nofollow noreferrer">4.3.1. Consume a token</a> 中所描述的所有在 token 开始时的情形。我们将会根据一个 token 开始的几个字符（小于等于 3 个）来确定这个 token 的后续部分应该如何解析。</p><h3 id="token-开始处的分类讨论">Token 开始处的分类讨论</h3><p>开始解析 token 的时候一定是在文件流的开头或者上一个 token 刚刚解析完毕的时候，那么此时我们只需要根据对应规则判断 token 类型即可。</p><p>首先预读 1 个字符，记为 <code>next</code>，然后对这个字符进行分类讨论。</p><ul><li><code>EOF</code>：直接返回 EOF-token。</li><li><code>\t</code>, <code>\n</code>, <code>\r</code>, <code>\f</code>, <code></code>：根据标准需要将此字符及后续的所有 whitespace 组合成一个 whitespace-token。</li><li><code>/</code>：如果是 <code>/*</code> 则一直读取到 <code>*/</code> 或者 <code>EOF</code> 作为 comment-token。</li><li><code>'</code> (单引号), <code>&quot;</code>(双引号)：遇到这两种引号，会调用字符串解析函数 <code>consumeStringToken()</code>。该函数会持续读取字符，直到遇到与之匹配的结束引号。在此过程中，它会处理转义字符（如 <code>\&quot;</code>）。如果在中途遇到换行符或文件末尾，则会生成一个 bad-string-token，否则生成一个 string-token。</li><li><code>0</code> ~ <code>9</code> 的数字字符：如果以数字开头，确定无疑是数字类型，调用数字解析函数 <code>consumeNumericToken()</code>。</li><li><code>(</code>, <code>)</code>, <code>[</code>, <code>]</code>, <code>&#123;</code>, <code>&#125;</code>：生成对应的括号字符。function-token 或者 url-token 的情况会在处理 ident-like 的时候另行考虑。</li><li><code>+</code>, <code>.</code>：这两个字符，再加上 <code>-</code>，都比较特殊。不过 <code>-</code> 需要包含一些额外的判断，因此归属于另外一条规则处理。<ul><li>解析器会向后预读，通过 <code>nextCharsAreNumber()</code> 判断后续字符是否能构成一个合法的数字（例如 <code>+1.5</code>, <code>.5</code>）。</li><li>如果可以，则调用 <code>consumeNumericToken()</code> 将其完整解析为一个 numeric-token。</li><li>如果不构成数字，则 <code>+</code> 和 <code>.</code> 会被当作 delimiter-token。</li></ul></li><li><code>-</code>：除了像 <code>+</code> 一样判断是否有可能进入数字的处理逻辑以外，还需要考虑作为 <code>--&gt;</code> (CDC-token) 和 ident-like 的情况。如果都不是才会被当做 delimiter-token。</li><li><code>&lt;</code>：如果能构成 <code>&lt;!--</code>，解析为一个 CDO-token，否则解析为 delimiter-token。</li><li><code>*</code>, <code>^</code>, <code>$</code>, <code>|</code>, <code>~</code>: 这些是属性选择器中的匹配符。<ul><li>如果它们后面紧跟 <code>=</code>，则会组合成一个专有 token：<ul><li><code>*=</code> → substring-match-token</li><li><code>^=</code> → prefix-match-token</li><li><code>$=</code> → suffix-match-token</li><li><code>~=</code> → include-match-token</li><li><code>|=</code> → dash-match-token</li></ul></li><li>特别地，对于 <code>|</code>，如果能够组成 <code>||</code>，则会成为 column-token。</li><li>如果没有，则单独作为 delimiter-token。</li></ul></li><li><code>@</code>：如果后续的字符能够组成一个 identifier，那么解析为 at-keyword-token，否则解析为 delimiter-token。</li><li><code>,</code> (逗号)：直接生成 comma-token。</li><li><code>:</code> (冒号)：直接生成 colon-token。</li><li><code>;</code> (分号)：直接生成 semicolon-token。</li><li><code>u</code> 或 <code>U</code>：这是一个特殊前缀。如果其后是 + 紧跟着十六进制数字或 ? (例如 U+26 或 u+A?)，则调用 <code>consumeUnicodeRangeToken()</code> 解析为一个 urange-token。否则，按标识符处理。<ul><li>这里有一个坑点，需要在编写 parser 的时候注意，比如 <code>u+a</code> 既是一个合法的 unicode-range，也是一个合法的 selector，需要根据上下文来判定。</li></ul></li><li>1 &lt;= c &lt;= 31, <code>!</code>, <code>%</code>, <code>&amp;</code>, <code>=</code>, <code>&gt;</code>, <code>?</code>, <code>`</code>, 127：解析为 delimiter-token。</li><li>其余字符：尝试解析为 ident-like。</li></ul><p>整个流程在 <a href="https://github.com/renbaoshuo/go-css-lexer/blob/7c4a62d23d98865692e3633de64db503b56f6556/lexer.go#L24-L198" rel="external nofollow noreferrer"><code>lexer.go</code> 的 24-198 行</a>，由于篇幅原因此处就不贴代码了。</p><h3 id="token-解析">Token 解析</h3><p>为了方便，我们为几种逻辑复杂 / 需要重用的 token 解析逻辑进行了封装，产生了如下函数：</p><ul><li><p><a href="https://github.com/renbaoshuo/go-css-lexer/blob/7c4a62d23d98865692e3633de64db503b56f6556/consume_token.go#L3-L16" rel="external nofollow noreferrer"><code>consumeNumericToken()</code></a></p><ul><li>先 consume 一个数字；</li><li>如果后续跟一个合法的 name，则 consume 这个 name 作为它的单位，组合为 dimension-token；</li><li>如果后续跟一个 <code>%</code>，consume 掉这个 <code>%</code>，产生一个 percentage-token；</li><li>否则产生一个 number-token。</li></ul><pre><code class="hljs go"><span class="hljs-comment">// https://www.w3.org/TR/2021/CRD-css-syntax-3-20211224/#consume-numeric-token</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(l *Lexer)</span></span> Next() (TokenType, []<span class="hljs-type">rune</span>)</code></pre><p>在 <code>Next</code> 方法中有一个巨大的 switch-case 语句，这里面包含了 <a href="https://www.w3.org/TR/2021/CRD-css-syntax-3-20211224/#consume-token" rel="external nofollow noreferrer">4.3.1. Consume a token</a> 中所描述的所有在 token 开始时的情形。我们将会根据一个 token 开始的几个字符（小于等于 3 个）来确定这个 token 的后续部分应该如何解析。</p><h3 id="token-开始处的分类讨论">Token 开始处的分类讨论</h3><p>开始解析 token 的时候一定是在文件流的开头或者上一个 token 刚刚解析完毕的时候，那么此时我们只需要根据对应规则判断 token 类型即可。</p><p>首先预读 1 个字符，记为 <code>next</code>，然后对这个字符进行分类讨论。</p><ul><li><p><code>EOF</code>：直接返回 EOF-token。</p></li><li><p><code>\t</code>, <code>\n</code>, <code>\r</code>, <code>\f</code>, <code></code>：根据标准需要将此字符及后续的所有 whitespace 组合成一个 whitespace-token。</p></li><li><p><code>/</code>：如果是 <code>/*</code> 则一直读取到 <code>*/</code> 或者 <code>EOF</code> 作为 comment-token。</p></li><li><p><code>'</code> (单引号), <code>&quot;</code>(双引号)：遇到这两种引号，会调用字符串解析函数 <code>consumeStringToken()</code>。该函数会持续读取字符，直到遇到与之匹配的结束引号。在此过程中，它会处理转义字符（如 <code>\&quot;</code>）。如果在中途遇到换行符或文件末尾，则会生成一个 bad-string-token，否则生成一个 string-token。</p></li><li><p><code>0</code> ~ <code>9</code> 的数字字符：如果以数字开头，确定无疑是数字类型，调用数字解析函数 <code>consumeNumericToken()</code>。</p></li><li><p><code>(</code>, <code>)</code>, <code>[</code>, <code>]</code>, <code>&#123;</code>, <code>&#125;</code>：生成对应的括号字符。function-token 或者 url-token 的情况会在处理 ident-like 的时候另行考虑。</p></li><li><p><code>+</code>, <code>.</code>：这两个字符，再加上 <code>-</code>，都比较特殊。不过 <code>-</code> 需要包含一些额外的判断，因此归属于另外一条规则处理。</p><ul><li>解析器会向后预读，通过 <code>nextCharsAreNumber()</code> 判断后续字符是否能构成一个合法的数字（例如 <code>+1.5</code>, <code>.5</code>）。</li><li>如果可以，则调用 <code>consumeNumericToken()</code> 将其完整解析为一个 numeric-token。</li><li>如果不构成数字，则 <code>+</code> 和 <code>.</code> 会被当作 delimiter-token。</li></ul></li><li><p><code>-</code>：除了像 <code>+</code> 一样判断是否有可能进入数字的处理逻辑以外，还需要考虑作为 <code>--&gt;</code> (CDC-token) 和 ident-like 的情况。如果都不是才会被当做 delimiter-token。</p><pre><code class="hljs go"><span class="hljs-keyword">if</span> l.nextCharsAreNumber() &#123;
+    <span class="hljs-keyword">return</span> l.consumeNumericToken()
+&#125;
+<span class="hljs-keyword">if</span> l.r.Peek(<span class="hljs-number">1</span>) == <span class="hljs-string">&#x27;-&#x27;</span> &amp;&amp; l.r.Peek(<span class="hljs-number">2</span>) == <span class="hljs-string">&#x27;&gt;&#x27;</span> &#123;
+    l.r.Move(<span class="hljs-number">3</span>) <span class="hljs-comment">// consume &quot;--&gt;&quot;</span>
+    <span class="hljs-keyword">return</span> CDCToken, l.r.Shift()
+&#125;
+<span class="hljs-keyword">if</span> l.nextCharsAreIdentifier() &#123;
+    <span class="hljs-keyword">return</span> l.consumeIdentLikeToken()
+&#125;
+l.r.Move(<span class="hljs-number">1</span>)
+<span class="hljs-keyword">return</span> DelimiterToken, l.r.Shift()</code></pre></li><li><p><code>&lt;</code>：如果能构成 <code>&lt;!--</code>，解析为一个 CDO-token，否则解析为 delimiter-token。</p></li><li><p><code>*</code>, <code>^</code>, <code>$</code>, <code>|</code>, <code>~</code>: 这些是属性选择器中的匹配符。</p><ul><li>如果它们后面紧跟 <code>=</code>，则会组合成一个专有 token：<ul><li><code>*=</code> → substring-match-token</li><li><code>^=</code> → prefix-match-token</li><li><code>$=</code> → suffix-match-token</li><li><code>~=</code> → include-match-token</li><li><code>|=</code> → dash-match-token</li></ul></li><li>特别地，对于 <code>|</code>，如果能够组成 <code>||</code>，则会成为 column-token。</li><li>如果没有，则单独作为 delimiter-token。</li></ul></li><li><p><code>@</code>：如果后续的字符能够组成一个 identifier，那么解析为 at-keyword-token，否则解析为 delimiter-token。</p></li><li><p><code>,</code> (逗号)：直接生成 comma-token。</p></li><li><p><code>:</code> (冒号)：直接生成 colon-token。</p></li><li><p><code>;</code> (分号)：直接生成 semicolon-token。</p></li><li><p><code>u</code> 或 <code>U</code>：这是一个特殊前缀。如果其后是 + 紧跟着十六进制数字或 ? (例如 U+26 或 u+A?)，则调用 <code>consumeUnicodeRangeToken()</code> 解析为一个 urange-token。否则，按标识符处理。</p><ul><li>这里有一个坑点，需要在编写 parser 的时候注意，比如 <code>u+a</code> 既是一个合法的 unicode-range，也是一个合法的 selector，需要根据上下文来判定。</li></ul></li><li><p>1 &lt;= c &lt;= 31, <code>!</code>, <code>%</code>, <code>&amp;</code>, <code>=</code>, <code>&gt;</code>, <code>?</code>, <code>`</code>, 127：解析为 delimiter-token。</p></li><li><p>其余字符：尝试解析为 ident-like。</p></li></ul><p>整个流程在 <a href="https://github.com/renbaoshuo/go-css-lexer/blob/7c4a62d23d98865692e3633de64db503b56f6556/lexer.go#L24-L198" rel="external nofollow noreferrer"><code>lexer.go</code> 的 24-198 行</a>，由于篇幅原因此处就不贴完整代码了。</p><h3 id="token-解析">Token 解析</h3><p>为了方便，我们为几种逻辑复杂 / 需要重用的 token 解析逻辑进行了封装，产生了如下函数：</p><ul><li><p><a href="https://github.com/renbaoshuo/go-css-lexer/blob/7c4a62d23d98865692e3633de64db503b56f6556/consume_token.go#L3-L16" rel="external nofollow noreferrer"><code>consumeNumericToken()</code></a></p><ul><li>先 consume 一个数字；</li><li>如果后续跟一个合法的 name，则 consume 这个 name 作为它的单位，组合为 dimension-token；</li><li>如果后续跟一个 <code>%</code>，consume 掉这个 <code>%</code>，产生一个 percentage-token；</li><li>否则产生一个 number-token。</li></ul><pre><code class="hljs go"><span class="hljs-comment">// https://www.w3.org/TR/2021/CRD-css-syntax-3-20211224/#consume-numeric-token</span>
 <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(l *Lexer)</span></span> consumeNumericToken() (TokenType, []<span class="hljs-type">rune</span>) &#123;
     l.consumeNumber()
 
@@ -375,7 +386,56 @@ UnicodeRangeToken</code></pre><p>于是乎，我们就有了词法分析的期�
 
         l.r.Move(<span class="hljs-number">1</span>)
     &#125;
-&#125;</code></pre></li></ul><h3 id="小结">小结</h3><p>让我们来总结一下 lexer 工作流程：在 lexer 读取到某个 token 的起始点的时候，lexer 预读起始的几个字符，然后辨别 token 的类型。对于大致分类好的 token，根据其更具体的特征预读并消耗掉对应的字符，直到这个 token 结束。</p><p>大致的类型辨别是通过 <code>Next()</code> 函数中的那个巨大的 switch-case 语句来完成的。而对于精细的 token 类型的判断，则是 case 中的语句和 <code>consume_token.go</code> 定义的一系列函数来共同完成的。至于 token 内部的字符段的解析，则是 <code>consume.go</code> 中的一系列函数完成的。由此组合，整个 token 的解析过程得以良好运转。</p><h2 id="测试">测试</h2><p>为了验证 lexer 的实现正确性，我们引入了 <a href="https://github.com/romainmenke/css-tokenizer-tests/tree/5e2112b59e728205a870ff130987e5204c425f59/tests" rel="external nofollow noreferrer">romainmenke/css-tokenizer-tests</a> 的测试用例来对 lexer 进行测试。具体的测试流程可以参考 <a href="https://github.com/renbaoshuo/go-css-lexer/blob/master/lexer_test.go" rel="external nofollow noreferrer"><code>lexer_test.go</code></a> 中的实现。</p><p>根据测试结果来看，出现的问题主要集中在与转义字符相关的处理，对于大部分情况已经能够正常解析。截止编写本文之时，测试通过率为 96.53% (167/173)，个人认为已经处于可用水平。</p><h2 id="后记">后记</h2><p>文中所述的 lexer 的具体实现已经开源在 <a href="https://github.com/renbaoshuo/go-css-lexer" rel="external nofollow noreferrer">renbaoshuo/go-css-lexer</a>，欢迎大家 Star！</p><p>搓这个 lexer 花了半个周末的时间，修修补补又消耗了一些时间。也算是在工作之余充实自己的大脑了。</p><p>文章题图由 Gemini 2.5 Pro Imagen 生成。</p>]]></content>
+&#125;</code></pre></li></ul><h3 id="identifier-和-number-的鉴别逻辑">Identifier 和 Number 的鉴别逻辑</h3><p>对于 identifier，我们根据以下标准判断接下来的字符是否可能开始一个 identifier 的序列：</p><ul><li>第一位是 NameStartCodePoint（以英文字母、下划线或非 ASCII 字母开始）；或</li><li>第一位和第二位组合起来可以开始一段转义序列；或</li><li>以 <code>-</code> 开始的 identifier（再走一遍上面两点的识别流程，同时注意 <code>--</code> 的情况）。</li></ul><pre><code class="hljs go"><span class="hljs-comment">// https://www.w3.org/TR/2021/CRD-css-syntax-3-20211224/#would-start-an-identifier</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(l *Lexer)</span></span> nextCharsAreIdentifier() <span class="hljs-type">bool</span> &#123;
+    first := l.r.Peek(<span class="hljs-number">0</span>)
+
+    <span class="hljs-keyword">if</span> isNameStartCodePoint(first) &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+    &#125;
+
+    second := l.r.Peek(<span class="hljs-number">1</span>)
+
+    <span class="hljs-keyword">if</span> twoCharsAreValidEscape(first, second) &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+    &#125;
+
+    <span class="hljs-keyword">if</span> first == <span class="hljs-string">&#x27;-&#x27;</span> &#123;
+        <span class="hljs-keyword">return</span> isNameStartCodePoint(second) || second == <span class="hljs-string">&#x27;-&#x27;</span> ||
+            twoCharsAreValidEscape(second, l.r.Peek(<span class="hljs-number">2</span>))
+    &#125;
+
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+&#125;</code></pre><p>对于 number，当符合以下条件的时候可以开始一个 number 的序列：</p><ul><li>第一位是数字；</li><li>第一位是正负号，第二位是数字；</li><li>第一位是正负号，第二位是小数点，第三位是数字；</li><li>第一位是小数点，第二位是数字。</li></ul><pre><code class="hljs go"><span class="hljs-comment">// https://www.w3.org/TR/2021/CRD-css-syntax-3-20211224/#starts-with-a-number</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(l *Lexer)</span></span> nextCharsAreNumber() <span class="hljs-type">bool</span> &#123;
+    first := l.r.Peek(<span class="hljs-number">0</span>)
+
+    <span class="hljs-keyword">if</span> isASCIIDigit(first) &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+    &#125;
+
+    second := l.r.Peek(<span class="hljs-number">1</span>)
+
+    <span class="hljs-keyword">if</span> first == <span class="hljs-string">&#x27;+&#x27;</span> || first == <span class="hljs-string">&#x27;-&#x27;</span> &#123;
+        <span class="hljs-keyword">if</span> isASCIIDigit(second) &#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+        &#125;
+
+        <span class="hljs-keyword">if</span> second == <span class="hljs-string">&#x27;.&#x27;</span> &#123;
+            third := l.r.Peek(<span class="hljs-number">2</span>)
+
+            <span class="hljs-keyword">if</span> isASCIIDigit(third) &#123;
+                <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+            &#125;
+        &#125;
+    &#125;
+
+    <span class="hljs-keyword">if</span> first == <span class="hljs-string">&#x27;.&#x27;</span> &#123;
+        <span class="hljs-keyword">return</span> isASCIIDigit(second)
+    &#125;
+
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+&#125;</code></pre><h3 id="小结">小结</h3><p>让我们来总结一下 lexer 工作流程：在 lexer 读取到某个 token 的起始点的时候，lexer 预读起始的几个字符，然后辨别 token 的类型。对于大致分类好的 token，根据其更具体的特征预读并消耗掉对应的字符，直到这个 token 结束。</p><p>大致的类型辨别是通过 <code>Next()</code> 函数中的那个巨大的 switch-case 语句来完成的。而对于精细的 token 类型的判断，则是 case 中的语句和 <code>consume_token.go</code> 定义的一系列函数来共同完成的。至于 token 内部的字符段的解析，则是 <code>consume.go</code> 中的一系列函数完成的。由此组合，整个 token 的解析过程得以良好运转。</p><p>除了文中提到的相关方法以外，在 <a href="https://github.com/renbaoshuo/go-css-lexer/blob/7c4a62d23d98865692e3633de64db503b56f6556/util.go" rel="external nofollow noreferrer"><code>util.go</code></a> 中还有一系列的工具函数：</p><ul><li><code>func isASCII(c rune) bool</code></li><li><code>func isASCIIAlpha(c rune) bool</code></li><li><code>func isASCIIDigit(c rune) bool</code></li><li><code>func isASCIIHexDigit(c rune) bool</code></li><li><code>func isCSSNewline(c rune) bool</code></li><li><code>func isNameStartCodePoint(r rune) bool</code></li><li><code>func isNameCodePoint(r rune) bool</code></li><li><code>func isNonPrintableCodePoint(r rune) bool</code></li><li><code>func twoCharsAreValidEscape(first, second rune) bool</code></li><li><code>func isHTMLSpecialWhitespace(c rune) bool</code></li><li><code>func isHTMLWhitespace(c rune) bool</code></li></ul><p>这些函数的作用可以很容易地由它们的名字得知，故此处不再赘述。</p><h2 id="测试">测试</h2><p>为了验证 lexer 的实现正确性，我们引入了 <a href="https://github.com/romainmenke/css-tokenizer-tests/tree/5e2112b59e728205a870ff130987e5204c425f59/tests" rel="external nofollow noreferrer">romainmenke/css-tokenizer-tests</a> 的测试用例来对 lexer 进行测试。具体的测试流程可以参考 <a href="https://github.com/renbaoshuo/go-css-lexer/blob/master/lexer_test.go" rel="external nofollow noreferrer"><code>lexer_test.go</code></a> 中的实现。</p><p>根据测试结果来看，出现的问题主要集中在与转义字符相关的处理，对于大部分情况已经能够正常解析。截止编写本文之时，测试通过率为 96.53% (167/173)，个人认为已经处于可用水平。</p><h2 id="后记">后记</h2><p>文中所述的 lexer 的具体实现已经开源在 <a href="https://github.com/renbaoshuo/go-css-lexer" rel="external nofollow noreferrer">renbaoshuo/go-css-lexer</a>，欢迎大家 Star！</p><p>搓这个 lexer 花了半个周末的时间，修修补补又消耗了一些时间。也算是在工作之余充实自己的大脑了。后续还可能会针对预读相关的内存访问进行优化（不知道读者有没有发现最多会预读三个字符），以提升处理效率。</p><p>文章题图由 Gemini 2.5 Pro Imagen 生成。</p>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
