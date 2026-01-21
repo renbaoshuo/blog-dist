@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://blog.baoshuo.ren</id>
     <title>宝硕博客</title>
-    <updated>2025-08-19T08:24:15.595Z</updated>
+    <updated>2026-01-21T07:36:38.082Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <author>
         <name>宝硕</name>
@@ -10,12 +10,12 @@
     </author>
     <link rel="alternate" href="https://blog.baoshuo.ren"/>
     <entry>
-        <title type="html"><![CDATA[从 CSS 字符串到 AST（一）—— 词法分析器（Lexer）的实现]]></title>
+        <title type="html"><![CDATA[实现一个 CSS 词法分析器（Lexer）]]></title>
         <id>https://blog.baoshuo.ren/post/css-lexer/</id>
         <link href="https://blog.baoshuo.ren/post/css-lexer/"/>
         <updated>2025-08-05T15:18:52.000Z</updated>
         <summary type="html"><![CDATA[最近在实习的时候，遇到了一些需求，需要自己去实现 CSS 的解析、（伪）渲染流程。以之为契机，我学习了一下编译相关的知识，其中的第一环就是 Lexer。]]></summary>
-        <content type="html"><![CDATA[<img src="https://s1.baoshuo.ren/2025/08/05/GeYRiDgPyqwrCLU.jpg" width="100%" alt="从 CSS 字符串到 AST（一）—— 词法分析器（Lexer）的实现" /><p>最近在实习的时候，遇到了一些需求，需要自己去实现 CSS 的解析、（伪）渲染流程。以之为契机，我学习了一下编译相关的知识，其中的第一环就是 Lexer。</p><span id="more"></span><p>本文中的代码均使用 Go 实现，成果已经作为 Go 库 <a href="https://pkg.go.dev/go.baoshuo.dev/csslexer" rel="external nofollow noreferrer"><code>go.baoshuo.dev/csslexer</code></a> 发布。</p><ul><li>GitHub 仓库：<a href="https://github.com/renbaoshuo/go-css-lexer" rel="external nofollow noreferrer">renbaoshuo/go-css-lexer</a></li><li>实现标准：<a href="https://www.w3.org/TR/2021/CRD-css-syntax-3-20211224/" rel="external nofollow noreferrer">CSS Syntax Module Level 3 (W3C Candidate Recommendation Draft; 24 December 2021)</a></li></ul><p><em>建议在阅读本文前对 CSS 标准内容有一定理解。</em></p><h2 id="词法分析">词法分析</h2><blockquote><p>词法分析（lexical analysis）是计算机科学中将字符序列转换为记号（token，也有译为标记或词元）序列的过程。进行词法分析的程序或者函数叫作词法分析器（lexical analyzer，简称 lexer），也叫扫描器（scanner）。词法分析器一般以函数的形式存在，供语法分析器调用。</p><p><cite>——维基百科</cite></p></blockquote><p>词法分析是编译中的第一个步骤。它读入组成源码的字符流，并将他们组织成一个个的词素（lexeme）。有了词素以后，识别并标注它的类型，就可以生成一个 <code>&lt;token-name, attribute-value&gt;</code> 形式的词法单元（token）。这个单元会被传送给下一个步骤 —— 语法分析 —— 进行后续的处理。</p><p>在进行词法分析之前，首先要设定好到底有多少种 token 类型，然后再确定每个 token 类型的判断条件和解析方式。</p><h2 id="token-的分类">Token 的分类</h2><p>由 CSS Syntax Module Level 3 中的 <a href="https://www.w3.org/TR/2021/CRD-css-syntax-3-20211224/#tokenization" rel="external nofollow noreferrer">4. Tokenization</a> 一节可以得到 CSS 的 token 有以下几种类型：</p><pre><code class="hljs text">&lt;ident-token&gt;
+        <content type="html"><![CDATA[<img src="https://s1.baoshuo.ren/2025/08/05/GeYRiDgPyqwrCLU.jpg" width="100%" alt="实现一个 CSS 词法分析器（Lexer）" /><p>最近在实习的时候，遇到了一些需求，需要自己去实现 CSS 的解析、（伪）渲染流程。以之为契机，我学习了一下编译相关的知识，其中的第一环就是 Lexer。</p><span id="more"></span><p>本文中的代码均使用 Go 实现，成果已经作为 Go 库 <a href="https://pkg.go.dev/go.baoshuo.dev/csslexer" rel="external nofollow noreferrer"><code>go.baoshuo.dev/csslexer</code></a> 发布。</p><ul><li>GitHub 仓库：<a href="https://github.com/renbaoshuo/go-css-lexer" rel="external nofollow noreferrer">renbaoshuo/go-css-lexer</a></li><li>实现标准：<a href="https://www.w3.org/TR/2021/CRD-css-syntax-3-20211224/" rel="external nofollow noreferrer">CSS Syntax Module Level 3 (W3C Candidate Recommendation Draft; 24 December 2021)</a></li></ul><p><em>建议在阅读本文前对 CSS 标准内容有一定理解。</em></p><h2 id="词法分析">词法分析</h2><blockquote><p>词法分析（lexical analysis）是计算机科学中将字符序列转换为记号（token，也有译为标记或词元）序列的过程。进行词法分析的程序或者函数叫作词法分析器（lexical analyzer，简称 lexer），也叫扫描器（scanner）。词法分析器一般以函数的形式存在，供语法分析器调用。</p><p><cite>——维基百科</cite></p></blockquote><p>词法分析是编译中的第一个步骤。它读入组成源码的字符流，并将他们组织成一个个的词素（lexeme）。有了词素以后，识别并标注它的类型，就可以生成一个 <code>&lt;token-name, attribute-value&gt;</code> 形式的词法单元（token）。这个单元会被传送给下一个步骤 —— 语法分析 —— 进行后续的处理。</p><p>在进行词法分析之前，首先要设定好到底有多少种 token 类型，然后再确定每个 token 类型的判断条件和解析方式。</p><h2 id="token-的分类">Token 的分类</h2><p>由 CSS Syntax Module Level 3 中的 <a href="https://www.w3.org/TR/2021/CRD-css-syntax-3-20211224/#tokenization" rel="external nofollow noreferrer">4. Tokenization</a> 一节可以得到 CSS 的 token 有以下几种类型：</p><pre><code class="hljs text">&lt;ident-token&gt;
 &lt;function-token&gt;
 &lt;at-keyword-token&gt;
 &lt;hash-token&gt;
