@@ -2,13 +2,217 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://blog.baoshuo.ren</id>
     <title>宝硕博客</title>
-    <updated>2026-03-26T06:34:40.845Z</updated>
+    <updated>2026-03-30T12:09:47.884Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <author>
         <name>宝硕</name>
         <uri>https://baoshuo.ren</uri>
     </author>
     <link rel="alternate" href="https://blog.baoshuo.ren"/>
+    <entry>
+        <title type="html"><![CDATA[LLM 工程化在福 uu 中的落地实践 —— 假期自动调课的智能解析]]></title>
+        <id>https://blog.baoshuo.ren/post/fzuhelper-llm-as-function/</id>
+        <link href="https://blog.baoshuo.ren/post/fzuhelper-llm-as-function/"/>
+        <updated>2026-03-30T06:55:00.000Z</updated>
+        <summary type="html"><![CDATA[在对话框以外，大模型又能发挥什么作用呢？]]></summary>
+        <content type="html"><![CDATA[<img src="https://cos-1.cdn.baoshuo.xyz/blog-images/fzuhelper-llm-as-function.jpg" width="100%" alt="LLM 工程化在福 uu 中的落地实践 —— 假期自动调课的智能解析" /><p><em>—— 在对话框以外，大模型又能发挥什么作用呢？</em></p><p>在编写新版福 uu 后端代码的过程中，我们已经实现了从教务系统上读取调课信息并应用、展示到课程表上的能力。但这个调课的展示仅限于教师录入好的单次调课，对于教务处发布的全校性假日调课通知则并没有去做解析和展示的逻辑。</p><p>究其原因，是教务处发出的调课通知都长下面这个样子：</p><blockquote><p>1、10 月 1 日（星期三）至 10 月 8 日（星期三）放假，共 8 天，全校本科生课程（含通识教育选修课）停课。</p><p>2、9 月 28 日（星期日）补上 10 月 7 日（星期二）的课，10 月 11 日（星期六）补上 10 月 8 号（星期三）的课，原 9 月 28 日和 10 月 11 日的课程停课。</p></blockquote><p>这种自然语言格式的描述难以被代码解析。短短几行字背后，隐含着十余条调课规则 —— 哪些日期的课取消了？哪些日期的课被挪到了另一天？原来那一天的课又怎么办？</p><p>在过去，这些调课信息需要用户自行阅读通知、对照课表、在脑中完成推理，这极大地增加了用户的心智负担，同时也增加了同学们在补课的日子出现意外旷课的可能性。</p><p>但是 LLM 的出现，使这种任务有了可能的解决方案，我们可以利用其强大的自然语言理解能力来从中提取结构化的调课信息，从而直接给用户展示时间调整后的课程表，极大地提升用户体验。为了实现这个目标，我们需要对 LLM 进行工程化的封装，使其能够具备像传统解析函数一样的表征，从而优雅地接入到现有的业务流程中。</p><h2 id="why-this">Why this?</h2><p>在介绍我们的新方法以前，有必要先解释一下为什么这类通知不能用正则表达式或者规则引擎来解析。</p><p>首先是格式不固定。每次调课通知都可能由不同的老师起草，措辞、结构、标点习惯都各不相同。有时候会说「补上……的课」，有时候会说「调至……上课」，有时候会直接用「顺延」「提前」这样的表达。这导致了通知的格式不可能完全一致。</p><p>其次是语义嵌套复杂，单条规则背后往往隐藏着多个子规则。上面例子中的第二条，实际上包含了下面的几条逻辑：9 月 28 日原有课程停课；9 月 28 日按 10 月 7 日课表上课；10 月 11 日原有课程停课；10 月 11 日按 10 月 8 日课表上课。</p><p>如果用纯代码形式的规则引擎实现的话，会由于一种种边界情况的出现而越写越复杂，导致维护成本会随着边界情况的积累呈指数级增长。正因如此，LLM 的强大语言理解能力就能够派上用场了。</p><h2 id="llm-as-function">LLM as Function</h2><p>很多人对大模型的第一印象就是一个对话界面 —— 你问它答。但在福 uu 的这个场景中，我们需要的是一种完全不同的方案，输入一段教务处的通知，在合适的提示词引导下让其能够准确地输出一组结构化的调课规则。</p><p>在传统的业务流程中，要从某段数据中解析出一些结构化的数据，几乎都是编写一个函数来封装好解析能力。对于调用方而言，函数完全是一个黑盒，只需要按照约定的方式传参、返回结果，至于内部实现究竟如何是不需要关心的。</p><p>既然这样的话，我们完全可以把 LLM 调用封装成一个函数来实现一些功能，我们称其为「LLM Function」。没有多轮对话，没有用户交互，甚至没有前端界面。大模型在这里扮演的角色，更像是一个和传统的正则表达式、规则引擎等处于同一个生态位的解析引擎。但和传统的解析引擎相对比，利用大模型解析可以充分地理解自然语言，泛化性更强，不需要囿于固定的、一定能被代码描述的格式。</p><p>这种函数仍然具有可测试、可替换的特性，并不会对后续的开发维护流程产生什么特别的影响。</p><p>具体的实现请参阅仓库 <a href="https://github.com/renbaoshuo/llmfunc" rel="external nofollow noreferrer">renbaoshuo/llmfunc</a>。</p><h3 id="实现思路">实现思路</h3><p>把一次 LLM 调用看作一个普通函数 f(T) → R。</p><p>定义 <code>Function[T, R]</code> 接收类型为 <code>T</code> 的业务输入，返回类型为 <code>R</code> 的业务输出。调用者完全不需要关心中间经历了消息组装、模型推理、工具调用、响应解析这些细节，只需要 <code>fn.Run(ctx, &amp;input)</code> 就能拿到强类型的结果。</p><p>核心是一个泛型结构体：</p><pre><code class="hljs go"><span class="hljs-comment">// Function defines an LLM-backed function.</span>
+<span class="hljs-comment">//</span>
+<span class="hljs-comment">//   - T is the input type (must implement FunctionInputFormatter interface).</span>
+<span class="hljs-comment">//   - R is the output type.</span>
+<span class="hljs-keyword">type</span> Function[T any, R any] <span class="hljs-keyword">struct</span> &#123;
+    client *Client
+    output OutputHandler[T, R]
+    config *FunctionConfig
+&#125;</code></pre><p>它会完成下面三件事：</p><ol><li>将输入 <code>T</code> 转换为 LLM 的 <code>ChatCompletionMessage</code> 列表；</li><li>携带配置（Model、Temperature、Instruction 等）发起 API 请求；</li><li>将 LLM 的原始响应通过 <code>output</code> 函数转换为类型安全的 <code>R</code>。</li></ol><p>其中，<code>T</code> 是业务输入类型，相当于函数参数，<code>R</code> 是业务输出类型，相当于函数返回值。对于二者的具体处理，可以参见下面的介绍。</p><h3 id="输入侧转换">输入侧转换</h3><p>框架在设计的时候没有强制要求输入必须是某种固定格式，而是通过 <code>FunctionInputFormatter</code> 接口做了一层解耦。</p><pre><code class="hljs go"><span class="hljs-keyword">type</span> FunctionInput <span class="hljs-keyword">struct</span> &#123;
+    Messages []openai.ChatCompletionMessage <span class="hljs-string">`json:&quot;messages&quot;`</span>
+&#125;
+
+<span class="hljs-keyword">type</span> FunctionInputFormatter <span class="hljs-keyword">interface</span> &#123;
+    FunctionInput() *FunctionInput
+&#125;</code></pre><p>任何业务类型 <code>T</code>，只要实现了 <code>FunctionInput()</code> 方法，就能产出一个 <code>FunctionInput</code> 告诉框架「如何把我自己转换成 LLM 能理解的消息列表」。这样每种业务场景可以自行决定 prompt 的构造方式，比如一个「信息提取」和一个「翻译请求」可以有完全不同的消息组装逻辑，但都能被同一个 Function 框架驱动。</p><blockquote><p>为什么不直接让 <code>T</code> 就是 <code>FunctionInput</code>？</p><p>因为那样会迫使所有业务逻辑直接面对 <code>openai.ChatCompletionMessage</code> 这种底层结构，业务语义就被淹没了。</p></blockquote><p>之后在调用的时候，用实现好的接口生成构造向 LLM 发送请求使用的 <code>FunctionInput</code> 结构体。</p><pre><code class="hljs go"><span class="hljs-keyword">if</span> formatter, hasFormatter := any(*in).(FunctionInputFormatter); hasFormatter &#123;
+    input = formatter.FunctionInput()
+    ok = <span class="hljs-literal">true</span>
+&#125;</code></pre><p>这里的 <code>any(*in)</code> 是为了强制使用值类型实现 <code>FunctionInput</code> 的 formatter，避免值和指针混写的情况发生。</p><h3 id="输出侧转换">输出侧转换</h3><p>对于 LLM 输出的解析，框架允许调用方在创建 Function 时自定义符合 <code>OutputHandler[T, R]</code> 解析器，也提供了 <code>BypassOutput</code> 与 <code>UnmarshalOutput</code> 两种内置解析器。</p><ul><li><code>BypassOutput()</code> 直接返回一个包含 LLM 的原始输出字符串的结构体作为函数返回值；</li><li><code>UnmarshalOutput[T any, R any]()</code> 则将输出反序列化为一个类型为 <code>R</code> 的结构体来作为函数返回值。</li></ul><p>在创建 Function 时给定的输出解析器，会在每次调用函数的时候被用来解析 LLM 的输出。</p><h3 id="structured-output">Structured Output</h3><p>一般情况下，<code>UnmarshalOutput</code> 会配合 Structured Output 一起使用。如果启用了 Structured Output（前提是模型支持），那么则会使用以下代码自动生成提供给模型的 Output Schema：</p><pre><code class="hljs go"><span class="hljs-keyword">if</span> config.structuredOutput &#123;
+    schema, err := jsonschema.GenerateSchemaForType(*<span class="hljs-built_in">new</span>(R))
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-built_in">panic</span>(err)
+    &#125;
+    OutputSchema(schema).Apply(config)
+&#125;</code></pre><p>这段代码在 <code>NewFunction</code> 构造阶段执行，做了这几件事：</p><ol><li><code>new(R)</code> 创建一个 <code>R</code> 类型的零值实例；</li><li><code>jsonschema.GenerateSchemaForType</code> 通过反射从这个零值中提取出完整的 JSON Schema；</li><li>把 <code>schema</code> 存入 <code>config</code>。</li></ol><p>在生成 schema 的流程中，如果出现 error 只可能是 <code>R</code> 的类型定义本身有问题（比如包含了不可序列化的字段），这属于开发期就能暴露的 bug，所以直接 <code>panic</code> 是很合理的。</p><p>然后在 <code>Run</code> 阶段：</p><pre><code class="hljs go">req.ResponseFormat = &amp;openai.ChatCompletionResponseFormat&#123;
+    Type: openai.ChatCompletionResponseFormatTypeJSONSchema,
+    JSONSchema: &amp;openai.ChatCompletionResponseFormatJSONSchema&#123;
+        Name:        f.config.name,
+        Description: f.config.description,
+        Schema:      f.config.outputSchema,
+        Strict:      <span class="hljs-literal">true</span>,
+    &#125;,
+&#125;</code></pre><p>把 schema 注入到 OpenAI API 的请求中，强制 LLM 按照这个 schema 输出 JSON。</p><p>这里值得展开说说 Structured Output 对于这类业务场景的重要性。在没有 Structured Output 的时候，常见的做法是在 Prompt 里写上「请以 JSON 格式输出」，然后在代码里用正则或者字符串处理去提取 JSON 块。这种方式很脆弱 —— 模型可能会在 JSON 前后加上解释性的文字，可能会使用 Markdown 代码块，也可能因为输出截断导致 JSON 不完整。有了 Structured Output，模型在解码阶段就被约束在 schema 定义的范围内，输出的合法性由模型服务本身来保证，客户端代码可以直接 Unmarshal 而无需任何前处理。</p><p>总结一下，这样设计的好处是，在整个过程中，你只需要定义一个 Go struct，框架自动保证 LLM 输出能被安全地反序列化回这个 struct。</p><blockquote><p>注：如果模型支持 Tool Calling 但不支持 Structured Output 的话，可以通过劫持 instruction 强制要求模型调用 callback tool 的方式来实现结构化的输出，但这样子会对 Prompt 造成污染，因此还是尽量使用 Structured Output 为佳。</p></blockquote><h3 id="functional-options">Functional Options</h3><p><code>FunctionConfig</code> 通过经典的 Functional Options 模式暴露配置项：</p><pre><code class="hljs go">llmfunc.Name(<span class="hljs-string">&quot;auto_adjust_course&quot;</span>)               <span class="hljs-comment">// 函数名称</span>
+llmfunc.Description(<span class="hljs-string">&quot;解析调课通知&quot;</span>)               <span class="hljs-comment">// 函数描述</span>
+llmfunc.Instruction(<span class="hljs-string">&quot;你是一名调课通知解析助手...&quot;</span>) <span class="hljs-comment">// System Prompt</span>
+llmfunc.Model(<span class="hljs-string">&quot;deepseek-ai/DeepSeek-V3.2&quot;</span>)       <span class="hljs-comment">// 模型选择</span>
+llmfunc.Temperature(<span class="hljs-number">0.2</span>)                         <span class="hljs-comment">// 温度参数</span>
+llmfunc.StructuredOutput(<span class="hljs-literal">true</span>)                   <span class="hljs-comment">// 启用结构化输出</span></code></pre><p>每个选项都是一个实现了 <code>Option[*FunctionConfig]</code> 接口的值，通过 <code>Apply</code> 方法修改配置。这种模式的好处是 API 简洁、可扩展 —— 未来增加新的参数只需要加一个新函数，不需要修改已有代码。</p><p>在调课解析这个场景中，Temperature 设置为较低值（如 0.2）是一个有意为之的选择。调课通知的解析是一个事实提取任务，而非创意生成任务。我们希望模型的输出是稳定且确定的，而不是在多次调用之间产生差异。低 Temperature 使模型更倾向于选择概率最高的 token，从而让同一份通知的解析结果具有良好的幂等性。</p><h2 id="业务接入">业务接入</h2><h3 id="输入和输出类型">输入和输出类型</h3><p>输入类型 <code>AutoAdjustCourseInput</code> 包含通知的标题和正文两个字段，并实现了 <code>FunctionInputFormatter</code> 接口，将二者拼接为一条 User Message：</p><pre><code class="hljs go"><span class="hljs-keyword">type</span> AutoAdjustCourseInput <span class="hljs-keyword">struct</span> &#123;
+    Title   <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;title&quot;   description:&quot;通知标题&quot;`</span>
+    Content <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;content&quot; description:&quot;通知内容&quot;`</span>
+&#125;
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(i AutoAdjustCourseInput)</span></span> FunctionInput() *llmfunc.FunctionInput &#123;
+    <span class="hljs-keyword">return</span> &amp;llmfunc.FunctionInput&#123;
+        Messages: []openai.ChatCompletionMessage&#123;
+            &#123;
+                Role:    openai.ChatMessageRoleUser,
+                Content: fmt.Sprintf(<span class="hljs-string">&quot;#%s\n\n%s&quot;</span>, i.Title, i.Content),
+            &#125;,
+        &#125;,
+    &#125;
+&#125;</code></pre><p>输出类型的设计刻意保持简洁。每条调课记录只需要两个字段：<code>from_date</code> 表示原本上课的日期；<code>to_date</code> 表示调整后的实际上课日期，若课程取消则留空。不需要额外的字段，取消和换课的语义完全由 to_date 是否为空来区分。这样子可以让模型不在多个字段之间做复杂的联动判断，让模型专注于主要任务，以提升其准确度。</p><pre><code class="hljs go"><span class="hljs-keyword">type</span> AutoAdjustCourseItem <span class="hljs-keyword">struct</span> &#123;
+    FromDate <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;from_date&quot; description:&quot;调整前课程本应上课的日期，格式为 YYYY-MM-DD&quot;`</span>
+    ToDate   <span class="hljs-type">string</span> <span class="hljs-string">`json:&quot;to_date&quot;   description:&quot;调整后的实际上课日期，格式为 YYYY-MM-DD，如果课程取消则留空&quot;`</span>
+&#125;
+
+<span class="hljs-keyword">type</span> AutoAdjustCourseOutput <span class="hljs-keyword">struct</span> &#123;
+    Items []AutoAdjustCourseItem <span class="hljs-string">`json:&quot;items&quot;`</span>
+&#125;</code></pre><p>其中 description 会生成到 schema 中来帮助模型理解输出格式。具体支持的结构体标签可以查看 jsonschema 库中 <a href="https://github.com/sashabaranov/go-openai/blob/5d7a276f4c0e48f97354fe555cb793b52e350e62/jsonschema/json.go#L158-L212" rel="external nofollow noreferrer"><code>reflectSchemaObject</code></a> 的实现作为参考。</p><h3 id="编写-system-prompt">编写 System Prompt</h3><p>System Prompt 的质量直接决定了解析效果的上限。特别是对于「A 日补上 B 日的课，原 A 日课程停课」类型的表述，它们实际上各自对应着两条独立的记录，需要在 Prompt 中将这个隐含的拆分逻辑显式地写出来，避免模型不知道怎么处理这种情况而产生错误。</p><p>我们实际使用的 System Prompt 是由两部分组成的：</p><ol><li>逐条列举的解析规则；</li><li>一次完整的解析输入、思考、输出示例。</li></ol><pre><code class="hljs text">你是一名调课通知解析助手，负责从调课通知的标题和内容中提取调课信息。调课信息包括调整前的日期和调整后的日期（如果当日课程取消则留空）。
+请根据以下要求提取信息：
+1. 输入的通知中可能包含多条调课信息，请提取所有的调课信息。
+2. 日期格式为 YYYY-MM-DD。
+3. 对于通知中提到放假的日期，如果没有提到其对应的补课日期则表示课程取消，产生一条调课信息，调整前的日期是放假的日期，调整后的日期留空。
+4. 如果通知中提到日期X补上日期Y的课，则原来应该在日期X上课的课程取消，产生两条调课信息：一条是日期X的课程取消（调整后的日期留空），另一条是日期Y的课程调整（调整前的日期是X，调整后的日期是Y）。
+5. 输出的结果应该是一个包含多个调课信息的列表，每条调课信息包含调整前的日期和调整后的日期（如果当日课程取消则留空）。
+6. 如果无法提取到有效的调课信息，请返回一个空列表。
+
+【示例输入】
+# 关于2026年元旦放假课程调整的通知
+
+各学院，各教学单位：
+
+根据党政办有关2026年元旦放假通知的精神，现将放假期间的课程调整如下：
+1、1月1日（周四）至1月3日（周六）放假，共3天，全校本科生课程（含通识教育选修课）停课。
+2、1月4日（周日）补上1月2日（周五）的课，原1月4日的课程停课。
+3、因停课受影响的教学内容，请任课老师自行调整安排。
+
+请各学院、教学单位及时通知相关师生。
+
+教务处
+2025年12月29日
+
+【解析结果】
+第一条信息提示1月1日到1月3日放假，停课，得到一个1月1日、1月2日、1月3日均取消的记录列表；
+第二条信息提示1月4日补上1月2日的课，原1月4日的课程停课，得到一个1月4日取消的记录，将1月2日的取消记录改为调整到1月4日。
+综上，得到如示例输出所示的结果。
+
+【示例输出】
+[
+  &#123;
+    &quot;from_date&quot;: &quot;2026-01-01&quot;,
+    &quot;to_date&quot;: &quot;&quot;
+  &#125;,
+  &#123;
+    &quot;from_date&quot;: &quot;2026-01-02&quot;,
+    &quot;to_date&quot;: &quot;2026-01-04&quot;
+  &#125;,
+  &#123;
+    &quot;from_date&quot;: &quot;2026-01-03&quot;,
+    &quot;to_date&quot;: &quot;&quot;
+  &#125;,
+  &#123;
+    &quot;from_date&quot;: &quot;2026-01-04&quot;,
+    &quot;to_date&quot;: &quot;&quot;
+  &#125;
+]</code></pre><p>Prompt 中附带了一个完整的示例，以元旦放假通知为输入，逐步推导出最终的 items 列表。这种 few-shot 风格的引导，可以让模型在面对真实通知时直接按照以往的思路进行推理，极大地提升了推理过程的确定性。</p><h3 id="组装-llm-function">组装 LLM Function</h3><p>项目在 <code>pkg/ai/function.go</code> 中二次封装了一个薄薄的 <code>NewFunction</code> 函数，统一从配置中读取 API Key 和 Endpoint，避免在每个 LLM Function 里重复做一些获取配置的 dirty work。</p><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewFunction</span>[<span class="hljs-title">T</span> <span class="hljs-title">any</span>, <span class="hljs-title">R</span> <span class="hljs-title">any</span>]<span class="hljs-params">(</span></span>
+<span class="hljs-params"><span class="hljs-function">    handler llmfunc.OutputHandler[T, R],</span></span>
+<span class="hljs-params"><span class="hljs-function">    opts ...llmfunc.Option[*llmfunc.FunctionConfig],</span></span>
+<span class="hljs-params"><span class="hljs-function">)</span></span> *llmfunc.Function[T, R] &#123;
+    client := llmfunc.NewClient(config.AI.Key, config.AI.Endpoint)
+    <span class="hljs-keyword">return</span> llmfunc.NewFunction[T, R](client, handler, opts...)
+&#125;</code></pre><p>基于这个构造函数，<code>AutoAdjustCourse</code> 函数的完整实现如下：</p><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">AutoAdjustCourse</span><span class="hljs-params">(ctx context.Context, input AutoAdjustCourseInput)</span></span> (*AutoAdjustCourseOutput, <span class="hljs-type">error</span>) &#123;
+    f := NewFunction(
+        llmfunc.UnmarshalOutput[AutoAdjustCourseInput, AutoAdjustCourseOutput](),
+        llmfunc.Name(<span class="hljs-string">&quot;auto_adjust_course&quot;</span>),
+        llmfunc.Description(<span class="hljs-string">&quot;解析调课通知提取调课信息&quot;</span>),
+        llmfunc.Instruction(AutoAdjustCourseInstruction),
+        llmfunc.StructuredOutput(<span class="hljs-literal">true</span>),
+        llmfunc.Model(<span class="hljs-string">&quot;deepseek-ai/DeepSeek-V3.2&quot;</span>),
+        llmfunc.Temperature(<span class="hljs-number">0.2</span>),
+    )
+
+    output, err := f.Run(ctx, &amp;input)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;failed to run auto adjust course function: %w&quot;</span>, err)
+    &#125;
+
+    <span class="hljs-keyword">return</span> output, <span class="hljs-literal">nil</span>
+&#125;</code></pre><p>对于调用方而言，<code>AutoAdjustCourse</code> 和任何普通的解析函数没有任何区别，传入标题和正文，拿回结构化的 items 列表。多么优雅！</p><h3 id="定时爬取通知">定时爬取通知</h3><p><code>AutoAdjustCourse</code> 被接入在通知同步的定时任务里。系统在 <code>cmd/common/main.go</code> 中配置了一个定期爬取教务处通知的定时任务 <code>syncNoticeTask</code>，每次抓取到新通知时，会异步地触发调课解析流程：</p><pre><code class="hljs go"><span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(notice *jwch.NoticeInfo)</span></span> &#123;
+    ctx := context.Background()
+    <span class="hljs-keyword">if</span> err := commonSvc.NewCommonService(ctx, clientSet, taskQueue).ProcessAutoAdjustCourseNotice(notice); err != <span class="hljs-literal">nil</span> &#123;
+        logger.Errorf(<span class="hljs-string">&quot;ProcessAutoAdjustCourseNotice failed, title=%s url=%s err=%v&quot;</span>, notice.Title, notice.URL, err)
+    &#125;
+&#125;(row)</code></pre><p><code>ProcessAutoAdjustCourseNotice</code> 在内部处理时，首先按标题过滤，跳过标题中不包含「课程调整」的通知，如果需要处理，则拉取通知详情页的完整正文，然后解析规则：</p><pre><code class="hljs go"><span class="hljs-comment">// 获取通知内容</span>
+detail, err := jwch.NewStudent().GetNoticeDetail(&amp;jwch.NoticeDetailReq&#123;
+    WbTreeId: info.WbTreeId,
+    WbNewsId: info.WbNewsId,
+&#125;)
+
+<span class="hljs-comment">// 调用 LLM 从通知标题和正文中提取结构化的课程调整条目</span>
+result, err := ai.AutoAdjustCourse(s.ctx, ai.AutoAdjustCourseInput&#123;
+    Title:   info.Title,
+    Content: content,
+&#125;)</code></pre><p>拿到 items 列表后，后续处理完全回归到确定性的代码逻辑 —— 将每条记录的日期字符串映射到所在学期，并计算出对应的周次和星期，最终构造出 <code>model.AutoAdjustCourse</code> 准备存入数据库：</p><pre><code class="hljs go"><span class="hljs-comment">// 根据 from_date 查找所属学期</span>
+term, found := utils.FindTermByDate(calendar.Terms, fromDate)
+
+<span class="hljs-comment">// 计算 from_date 在该学期中对应的周次和星期几</span>
+fromWeek, fromWeekday, err := utils.GetWeekdayByDate(term.StartDate, item.FromDate)
+
+<span class="hljs-comment">// 构造最终数据</span>
+adjustCourse := &amp;model.AutoAdjustCourse&#123;
+    Year:        year,
+    FromDate:    item.FromDate,
+    ToDate:      toDate,
+    Term:        term.Term,
+    FromWeek:    <span class="hljs-type">int64</span>(fromWeek),
+    ToWeek:      toWeekPtr,
+    FromWeekday: <span class="hljs-type">int64</span>(fromWeekday),
+    ToWeekday:   toWeekdayPtr,
+    Enabled:     <span class="hljs-literal">false</span>, <span class="hljs-comment">// 默认禁用，等待人工审核后再启用</span>
+&#125;</code></pre><p>所有记录写入完成后，统一刷新涉及学期的缓存，确保后续的课表查询能立即感知到新的调课记录。</p><h3 id="应用调课规则">应用调课规则</h3><p>调课记录写入数据库并启用之后，在学生请求课表时，系统在拿到原始课程数据后，紧接着读取当前学期所有已启用的调课记录，并通过 <code>getAdjustRules</code> 生成匹配的调课规则，生成最终应用到课程上的 <code>CourseAdjustRule</code> 列表：</p><pre><code class="hljs go">autoAdjustCourses, err := s.GetAutoAdjustCourseList(req.Term)
+
+<span class="hljs-keyword">for</span> _, c := <span class="hljs-keyword">range</span> courses &#123;
+    adjustRules := getAdjustRules(c.ScheduleRules, autoAdjustCourses)
+    c.ScheduleRules = jwch.ApplyAdjustRules(
+        jwch.ApplyAdjustRules(c.ScheduleRules, c.AdjustRules),
+        adjustRules,
+    )
+&#125;</code></pre><p>注意这里有两层 <code>ApplyAdjustRules</code>，第一层应用的是教师在教务系统中录入的单次调课（jwch 库解析出来的 <code>c.AdjustRules</code>），第二层才是我们新增的全校性假期调课（前面生成的 <code>adjustRules</code>）。</p><p><code>getAdjustRules</code> 的核心逻辑是对于每条调课记录，遍历该课程的所有排课规则，找出「周次和星期与调课记录的 <code>from_week</code> / <code>from_weekday</code> 匹配」的那些排课，为其生成一条 <code>CourseAdjustRule</code>。这里就正好和前面的日期到周次和星期几的转换遥相呼应，通过预处理减少了在后续阶段的计算量。详细代码请参见 <a href="https://github.com/west2-online/fzuhelper-server/blob/404b688e63038c9c34477e978d98a2440a2f21c0/internal/course/service/get_course_list.go#L323-L367" rel="external nofollow noreferrer"><code>internal/course/service/get_course_list.go</code></a>，这里就不再单独贴出来了。</p><h3 id="多级缓存的设计">多级缓存的设计</h3><p>在 <code>GetCourseList</code> 的实现里，有一个特别的设计 —— 数据库和缓存存储的课表内容是不一样的。</p><pre><code class="hljs go"><span class="hljs-comment">// 写入数据库存储</span>
+originalCourses := pack.BuildCourse(courses)
+s.taskQueue.Add(fmt.Sprintf(<span class="hljs-string">&quot;putCourse:%s&quot;</span>, stuId), taskqueue.QueueTask&#123;Execute: <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> <span class="hljs-type">error</span> &#123;
+    <span class="hljs-keyword">return</span> s.putCourseToDatabase(stuId, req.Term, originalCourses)
+&#125;&#125;)
+
+<span class="hljs-comment">// ... 应用调课规则 ...</span>
+
+<span class="hljs-comment">// 写入缓存存储</span>
+s.taskQueue.Add(courseKey, taskqueue.QueueTask&#123;Execute: <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> <span class="hljs-type">error</span> &#123;
+    <span class="hljs-keyword">return</span> cache.SetSliceCache(s.cache, s.ctx, courseKey, courses,
+        constants.CourseTermsKeyExpire, <span class="hljs-string">&quot;Course.SetCourseCache&quot;</span>)
+&#125;&#125;)</code></pre><p>数据库存储原始数据是为了保留重新计算的能力。调课规则是随时可能变化的 —— 管理员可能启用新规则，也可能修改或禁用已有规则。如果数据库里存的是某个时间点的处理结果，那么每次规则变更后都需要遍历所有用户的历史数据重新修改并写入，代价极高。而存储原始课表，规则变更后只需要让缓存失效，下次访问时自然会用最新的规则重新计算并回写缓存，做到了数据和规则的解耦。</p><p>缓存存储调课后的数据是为了让 hot path 足够快。对于活跃用户而言，每次打开 App 查看课表都应该是毫秒级响应。如果缓存里存的是原始数据，那么每次命中缓存后还要再走一遍调课信息的匹配逻辑，而调课信息通常是不会频繁变化的，导致白白增加计算开销。所以把已经处理好的结果直接放进缓存，命中时直接返回即可。</p><h2 id="实际效果">实际效果</h2><p>以文章开头的国庆调课通知为例，来完整地走一遍我们设计的流程。</p><p>教务处通知发出后，<code>syncNoticeTask</code> 在下一个同步周期抓取到到新通知后，发现标题中含「课程调整」的关键词，随即在后台异步拉取通知正文并调用 <code>AutoAdjustCourse</code> 解析，解析后得到的结构化输出如下：</p><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span>
+  <span class="hljs-attr">&quot;items&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;from_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-10-01&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;to_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span> <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;from_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-10-02&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;to_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span> <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;from_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-10-03&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;to_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span> <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;from_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-10-04&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;to_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span> <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;from_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-10-05&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;to_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span> <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;from_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-10-06&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;to_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span> <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;from_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-10-07&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;to_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-09-28&quot;</span> <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;from_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-10-08&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;to_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-10-11&quot;</span> <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;from_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-09-28&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;to_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span> <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">&#123;</span> <span class="hljs-attr">&quot;from_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-10-11&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;to_date&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span> <span class="hljs-punctuation">&#125;</span>
+  <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">&#125;</span></code></pre><ul><li>10 月 1 日至 10 月 6 日连续停课；</li><li>10 月 7 日的课调到了 9 月 28 日；</li><li>10 月 8 日的课调到了 10 月 11 日；</li><li>而 9 月 28 日和 10 月 11 日原有的课程则各自产生了一条取消记录。</li></ul><p>这 10 条记录会先以未启用的状态存进数据库里，等待管理员审核后启用。启用后，所有查询该学期课表的请求都会经过 <code>getAdjustRules</code> 匹配，将受影响的那几节课从课表里移除，或者把它们调整到对应的补课日。用户打开 App，看到的已经是一张应用了全部调课规则的最终课表，不需要再对照通知自行推算。</p><p>整个过程对用户完全无感，LLM 解析发生在后台，与用户请求课表的链路没有任何交集；从用户视角来看，这和以往的课表体验没有任何不同，只是课表变「聪明」了。</p><h2 id="后记">后记</h2><p>回顾整个流程，LLM 只做了它最擅长的那一件事 —— 自然语言理解，把教务处的通知翻译成结构化的课程调整信息列表。之后的日期到周次的换算、学期的归属判断、与每门课排课规则的匹配、缓存的刷新，全部由确定性的代码完成。两种技术各司其职，边界清晰。</p><p>这种架构在工程上带来了一个令人满意的性质：整个系统没有任何一个环节是只有 LLM 能做但却又无法被验证的黑盒。AI 层的输出可以被单元测试固定下来验证，业务层的每一条分支都可以通过 mock 独立覆盖，规则应用层是没有副作用的纯函数，数据库存储的是原始事实而非中间结论。把 LLM 当作函数来使用，意味着它必须接受和普通函数一样的工程约束 —— 可测试、可替换、职责单一 —— 而这些约束反过来也让整个系统的可靠性有了更坚实的保证。</p><p>这次实践中由 LLM 承担的部分，从代码量上看并不大，甚至可以说很小。但它完成的是在此之前我们一直没有好办法处理的格式不固定的自然语言通知的解析。这类通知隐含着复杂语义嵌套的调课逻辑，纯靠代码很难完成解析。过去这些信息只能靠用户自己去查询记录、专门留意，而现在这件事由我们的系统替用户完成了。</p><p>这次实践虽然由 LLM 实现的部分并不是很大，但它让我们看到了大模型并不只是聊天窗口里那个无所不知的助手，它同样可以是系统架构图上一个朴素而可靠的函数节点，能够和普通的代码有机结合。</p><hr><p>相关代码：</p><ul><li><a href="https://github.com/renbaoshuo/llmfunc" rel="external nofollow noreferrer">renbaoshuo/llmfunc</a>：LLM Function 的封装实现。</li><li><a href="https://github.com/west2-online/fzuhelper-server/pull/402" rel="external nofollow noreferrer">west2-online/fzuhelper-server#402</a>：福 uu 服务端上自动调课解析的初版实现。</li></ul><p><em>本文所述业务接入部分的实现，是和正在参与西二在线 Go 组考核、福州大学 2025 级软件工程专业的吴佳伟同学一同完成的，在此表示感谢。感谢王智壹同学审阅本文并给出修改建议。</em></p>]]></content>
+        <author>
+            <name>宝硕</name>
+            <uri>https://baoshuo.ren</uri>
+        </author>
+    </entry>
     <entry>
         <title type="html"><![CDATA[实现一个 CSS 词法分析器（Lexer）]]></title>
         <id>https://blog.baoshuo.ren/post/css-lexer/</id>
@@ -1482,18 +1686,6 @@ sudo systemctl force-reload nginx</code></pre><p>然后新建一个名为 <code>
         <updated>2022-02-28T09:03:57.000Z</updated>
         <summary type="html"><![CDATA[这是我第一次出省参加外校集训。此行的目的地是江苏省常州高级中学，于 1907 年建校，截止本文写作时该校在「OIerDb 全国信息学竞赛学校排行榜」上位列第九。]]></summary>
         <content type="html"><![CDATA[<img src="https://s1.baoshuo.ren/2022/02/28/J5yx9hPKLZdu4Hz.jpg" width="100%" alt="2022 年常中集训游记" /><p>这是我第一次出省参加外校集训。此行的目的地是江苏省常州高级中学，于 1907 年建校，截止本文写作时该校在「OIerDb 全国信息学竞赛学校排行榜」上位列第九。</p><span id="more"></span><h2 id="启程">启程</h2><p>走前 2 天，也就是 2 月 18 日，我们才正式确定要动身去常中参加集训，当时火车票余票已经所剩无几了，索性直接买了一等座，省时省力，就是有点费钱。</p><p><img src="https://s1.baoshuo.ren/2022/02/28/ys2OdY56rtDC43U.jpg" width="51.25%" style="margin-right:4px"><img src="https://s1.baoshuo.ren/2022/02/28/JzSrD97LyP4KI8b.jpg" width="45%"></p><p>一等座确实比二等座舒服了很多，还有免费的零食、饮料、矿泉水。不过，要是下次可以自己挑的话，我还是选二等座，经济实惠。</p><img src="https://s1.baoshuo.ren/2022/02/28/AnK1PqdCfQHEcYj.jpg" width="300" style="display:block;margin:0 auto 1rem"><p>晚饭在火车上买了份「豚骨面」，花了 39 元，除了汤有点发酸（可能是醋倒多了）以外别的没啥毛病。</p><h2 id="见闻">见闻</h2><h3 id="住宿">住宿</h3><p>由于学校没有给我们提供宿舍，所以我们两人成团一起住宾馆，每间 160 元/晚。</p><p><img src="https://s1.baoshuo.ren/2022/02/28/vbwahiHPXu7IU21.jpg" alt="" loading="lazy"></p><p>环境还行，凑合着住。</p><h3 id="食堂">食堂</h3><p><img src="https://s1.baoshuo.ren/2022/02/28/YgAPOB6K7xFnwJI.jpg" alt="" loading="lazy"></p><p>▲ 外景</p><img src="https://s1.baoshuo.ren/2022/02/27/xaUc8KZ1WICibop.jpg" width="300" style="display:block;margin:0 auto 1rem"><p>▲ 饭卡</p><p>食堂的餐食比假期的二南好多了，但我觉得赶不上开学时候的二南食堂。</p><h3 id="蹭网">蹭网</h3><p>常中并没有给我们分配上网账号，所以要么用打开文件资源管理器都能死机的台式机上网，要么用自己的笔记本离线操作。</p><p>毛主席说过：「自己动手，丰衣足食。」所以我们把台式机的网线拔下来插到了自己的电脑上，并且手动配好了 IP 地址，成功解决了上网问题。</p><p>蹭网期间出一个小插曲：有人拿自己配好的网开热点给大家共享网络，结果被系统自动断网并且封掉设备了…</p><h3 id="校园">校园</h3><p><img src="https://s1.baoshuo.ren/2022/02/28/LS9EumNvBynMIV5.jpg" alt="" loading="lazy"></p><p>进入校园。</p><p><img src="https://s1.baoshuo.ren/2022/02/28/5K2pODGQ1U3ufhF.jpg" alt="" loading="lazy"></p><p>标志性的「<strong>SCZ</strong>」标识。</p><p><img src="https://s1.baoshuo.ren/2022/02/28/RYWTNgijmfVn6H2.jpg" alt="" loading="lazy"></p><p>校园一角。</p><p><img src="https://s1.baoshuo.ren/2022/02/28/wF9MVZO6W21rvnp.jpg" alt="" loading="lazy"></p><p>教学楼外景。</p><img src="https://s1.baoshuo.ren/2022/02/28/vqHWncS4VOZ6Rhd.jpg" height="450"><p>小亭子。</p><img src="https://s1.baoshuo.ren/2022/02/28/r7RFDVZcCAPuoNx.jpg" width="48%" style="margin-right:4px"> <img src="https://s1.baoshuo.ren/2022/02/28/RYzfbEPtmDBk6F9.jpg" width="48%"><p>学校旁边的 <a href="https://baike.baidu.com/item/%E5%A4%A9%E5%AE%81%E5%AE%9D%E5%A1%94" rel="external nofollow noreferrer">天宁宝塔</a>。</p><h2 id="返程">返程</h2><p>来的时候在火车上吃的是面条，于是返程的时候买了一盒「红烧牛肉饭」，花了 40 元，味道也不错。</p><p><img src="https://s1.baoshuo.ren/2022/02/28/4pWTVO6eE1UBwKk.jpg" alt="" loading="lazy"></p><h3 id="花絮">花絮</h3><p>回学校的最后一段路是坐公交回去的。</p><p>到站了，老师带着我们下了车，下车后才发现 zzq 还在车上，于是我们眼睁睁地看着公交车继续前行，而 zzq 还不知道他已经坐过站了…</p><h2 id="后记">后记</h2><p>在校期间的学习、交流等活动均属保密范畴，在本文中不做叙述。</p><p>希望以后还能有这么好的机会参加外出集训。</p>]]></content>
-        <author>
-            <name>宝硕</name>
-            <uri>https://baoshuo.ren</uri>
-        </author>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[再见，2021 —— 我的 2021 年度总结]]></title>
-        <id>https://blog.baoshuo.ren/post/goodbye-2021/</id>
-        <link href="https://blog.baoshuo.ren/post/goodbye-2021/"/>
-        <updated>2021-12-31T06:21:49.000Z</updated>
-        <summary type="html"><![CDATA[时光飞逝，2021 年就这么过完了。在这一年，我经历了很多，也学到了很多。现在，让我坐在电脑前，用文字的方式将这一切都记录下来…]]></summary>
-        <content type="html"><![CDATA[<img src="https://arina.loli.net/2022/01/01/E215KwxIFUGnXlN.png" width="100%" alt="再见，2021 —— 我的 2021 年度总结" /><p>时光飞逝，2021 年就这么过完了。在这一年，我经历了很多，也学到了很多。现在，让我坐在电脑前，用文字的方式将这一切都记录下来…</p><span id="more"></span><blockquote><p>本文内容按照发生时间先后排序。</p></blockquote><h2 id="大事记">大事记</h2><h3 id="封校的日子">封校的日子</h3><p>2021 年 1 月 3 日，<a href="https://zh.wikipedia.org/wiki/2019%E5%86%A0%E7%8A%B6%E7%97%85%E6%AF%92%E7%97%85%E6%B2%B3%E5%8C%97%E7%9C%81%E7%96%AB%E6%83%85#1%E6%9C%88_2" rel="external nofollow noreferrer">石家庄疫情</a> 爆发，石家庄市进入战时状态<sup>（<a href="http://www.xinhuanet.com/local/2021-01/04/c_1126942898.htm" rel="external nofollow noreferrer">新华网</a>）</sup>。</p><p>次日清晨，学校里传开了一条爆炸性新闻 —— 封校了！</p><p>中午下课后，大家纷纷奔向学校超市，开始抢购商品。由于初三下课最晚，等我们奔向超市的时候，超市空得连价签都没了。我并没有去抢，因为我在元旦假期返校的时候带了不少东西，足够我吃了。</p><p>然而超市一连好几天无货可卖，这使得我们都开始担心 —— 万一哪天没饭了怎么办？而这时学校终于传来了好消息：学校和政府终于为超市协调来了货源，可以继续上架面包、牛奶和生活必需品了。</p><p>不过我去食堂的时候倒是发现了一个以前从未出现的奇妙现象，那就是肉给的比菜多。我举一个典型事例：我去食堂买板面吃，食堂阿姨给我盛了半勺子肉，然后从旁边的菜盆里夹了三根很小的菠菜叶放到了碗里。除此之外，免费续米饭的量也变得越来越少。不过有的吃我就知足了，没必要那么挑。</p><p>周末学校还给放了电影，周日按照正常留宿作息多睡了会。封校的第一周就这么过去了。</p><p>谁也没想到封校会持续那么久，于是大家都在学校呆着，在学习的同时等待外界的好消息。</p><p>有一次教育处的尹主任值我们班晚自习，我正好坐第一排，作业写完了没事干，又去不了高中部，便和老师聊了起来。我向老师抱怨初三的学生觉不够睡，而初一的学生休息时间太多以至于睡不着觉，希望能多给初三的学生点休息时间，不然上课得困死。听完以后，老师给年级主任发了条微信。没想到，第二节晚自习下课，年级就广播说以后每周六都让初三的多睡一小时。多亏了尹主任的反馈，我终于能补个好觉了，上课也终于不用再半睡半醒了。</p><p>就这样又过了大概二十天，外面终于传来了好消息 —— 解封了！</p><p>听到解封的消息时，我的心情很复杂 —— 我的健康码是黄色的。这代表即使学校解封了，我也回不了家。</p><p>好在解封的第二天，我的健康码变回了绿色，当天下午我被接回了家，一切都结束了。</p><h3 id="中考">中考</h3><p>6 月 21 日，我迎来了人生中的第一次大考 —— 中考。</p><img style="display:inline-block" width="42.5%" src="https://arina.loli.net/2021/12/29/rtJy8mUM4jSRBNa.png"> <img style="display:inline-block" width="55%" src="https://arina.loli.net/2021/12/29/Gn4h1Qx2aMYkAsz.png"><p>说实话，头进考场我还是有一点点发慌的，因为我的知识大多都是退役以后现补的。物理的力学还没补，语文的古诗文刚背完原文没背课注和赏析，<span title="看完会吐">政治看都没看</span>…</p><p>总之没好好复习就是了。就这样硬着头皮进了考场，考啥算啥吧。</p><p>考完以后便是漫长的等待。7 月 3 日 0 时，终于出分了：</p><img width="500" src="https://arina.loli.net/2021/12/30/5PuseCqbXcI1KJ7.png/500/1000"><p>中考试卷的难易度还算适中，考得不算特别差，全市三千多名。</p><p>由于疫情的原因，石家庄并没有举行体育和实验的考试，所以中考总分只有 610 分。这对于体育不是很好的我来说是一个救命稻草，要不然我得比别人低至少 10 分，就没学可上了。</p><p>中考成绩出来以后，我向我的竞赛教练咨询了一下我的成绩，教练告诉我没啥问题，能上二南。</p><img width="500" src="https://arina.loli.net/2021/12/31/ot5Q9TGgVdzjNAn.png/500/1000"> <img width="300" src="https://arina.loli.net/2022/01/01/Mf75RmDqwz2UvAV.jpg"><p>居然混进了一个省重点高中… 失学儿童有学上了！</p><p>上了高中以后因为学习竞赛，被分到了省理科竞赛实验班，大概是全校最好的班级了吧。只不过因为班里其他人都是各地状元，所以我的文化课被同学们吊起来暴锤。</p><p>总体还行。只是没想到因为这些事就被别人称为了「别人家的孩子」，当不起当不起，毕竟我是真的菜…</p><h3 id="竞赛">竞赛</h3><p>今年的竞赛成绩并不理想。</p><p>CSP 拿了个省二，再多考 19 分就有省一了。</p><p>NOIP 打算冲省一，结果考试的时候电脑蓝屏了… 以后再也不用画图当草稿纸了！</p><p>不过和自己的好朋友们在一起<span title="卷">努力</span>还是很开心的~</p><p>丢人的练习详情可以在 GitHub 上查看：<a href="https://github.com/renbaoshuo/OI-codes/compare/2020...2021" rel="external nofollow noreferrer">Compare 2020…2021 - renbaoshuo/OI-codes</a>。</p><h2 id="一些零碎">一些零碎</h2><h3 id="gpg">GPG</h3><p>今年年初，我开始使用 GPG 来对我的消息和提交签名。</p><p>我的 GPG 公钥可以在 <a href="https://github.com/renbaoshuo.gpg" rel="external nofollow noreferrer">GitHub</a> 上找到。</p><h3 id="hustoj">HUSTOJ</h3><p><img src="https://arina.loli.net/2021/12/31/TOlfnVsAbjMhm7w.png" alt="" loading="lazy"></p><p><img src="https://arina.loli.net/2021/12/31/gcy5o86unOZTVLP.png" alt="" loading="lazy"></p><p>年初的时候给 HUSTOJ 贡献了两个主题：<a href="https://github.com/zhblue/hustoj/pull/722" rel="external nofollow noreferrer">SYZOJ</a> 和 <a href="https://github.com/zhblue/hustoj/pull/742" rel="external nofollow noreferrer">MDUI</a>。</p><p>因为 SYZOJ 主题被设置为了默认主题，所以年末的时候还被教练找上门问 HUSTOJ 相关的问题来了。</p><h3 id="计算机网络">计算机网络</h3><p>从寒假开始我开始接触计算机网络相关的知识，并且在 DN42 和公网上进行了相关实践。</p><h3 id="pure-主题">Pure 主题</h3><p><img src="https://arina.loli.net/2021/12/31/xLCYesoFNqvWfbz.png" alt="" loading="lazy"></p><p>这个主题移植自 <a href="https://github.com/imhanjie/gridea-theme-pure" rel="external nofollow noreferrer">imhanjie/gridea-theme-pure</a>。</p><p>源代码公开在 <a href="https://github.com/renbaoshuo/hexo-theme-pure" rel="external nofollow noreferrer">GitHub</a> 上。</p><h3 id="我的-yubikey">我的 Yubikey</h3><img width="400" src="https://arina.loli.net/2022/01/01/oMcSKAaizC7X9fZ.jpg"><p>体验良好，于是年末又入了个 CanoKey 作为备用 Key。</p><h3 id="oierdb-ng">OIerDb NG</h3><p><img src="https://arina.loli.net/2021/12/31/iBmAh6MeGRHyKl7.png" alt="" loading="lazy"></p><p>这是个从 12 月份刚刚开始搞的项目，目前正处于开发期，由我和 <a href="https://men.ci" rel="external nofollow noreferrer">Menci</a> 共同维护。</p><p>计划中 <a href="https://oier.baoshuo.dev" rel="external nofollow noreferrer">OIerDb NG</a> 将会最终替代现在的 <a href="https://bytew.net/OIer" rel="external nofollow noreferrer">OIerDb</a>。</p><p>OIerDb NG 的前端缓存式查询方法在提高查询速度的同时还省去了后端服务器的处理。</p><p>代码开源在 <a href="https://github.com/OIerDb-ng/OIerDb" rel="external nofollow noreferrer">GitHub</a> 上，欢迎 Star ~</p><h3 id="其他">其他</h3><img width="700" src="https://arina.loli.net/2021/12/31/y5cxk7JwaolAnO1.png"><p>其实里面有好多都是贡献给自己的私有仓库了。</p><p>可以直接去 <a href="https://github.com/renbaoshuo?tab=overview&amp;from=2021-12-01&amp;to=2021-12-31" rel="external nofollow noreferrer">我的 GitHub 主页</a> 上看公开的贡献详情，懒得再多说了。</p><h2 id="后记">后记</h2><p>2021 年一转眼就过完了，有很多新收获，同时也有很多遗憾，就不再多说了。</p><p>希望自己 2022 年会过得更好吧，也祝读者们新年快乐。</p><p><small>本文封面图片来自美国驻华使领馆官方推特账号，其他图片均为本人所拍摄或截取。</small></p>]]></content>
         <author>
             <name>宝硕</name>
             <uri>https://baoshuo.ren</uri>
